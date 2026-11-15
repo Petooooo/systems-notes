@@ -13,6 +13,7 @@ KEY = re.compile(r"^([A-Za-z][A-Za-z0-9_-]*):\s*(.*?)\s*$")
 SLUG = re.compile(r"^study-[a-z0-9]+(?:-[a-z0-9]+)*$")
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 ENGLISH_LABEL = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 ./&+()_-]*$")
+HANGUL = re.compile(r"[가-힣]")
 
 
 def fields(path: Path) -> dict[str, str]:
@@ -53,9 +54,14 @@ def main() -> int:
             if slug in seen:
                 raise ValueError(f"duplicate slug also used in {seen[slug]}")
             seen[slug] = str(relative)
-            for label in ("area", "category"):
-                if not ENGLISH_LABEL.fullmatch(meta[label]):
-                    raise ValueError(f"{label} must be an English category label")
+            for label in ("area", "category", "series"):
+                if label in meta and not ENGLISH_LABEL.fullmatch(meta[label]):
+                    raise ValueError(f"{label} must be an English label")
+            for label in ("title", "description"):
+                if not HANGUL.search(meta[label]):
+                    raise ValueError(f"{label} must include a Korean description/title")
+            if "tags" in meta and HANGUL.search(meta["tags"]):
+                raise ValueError("tags must be English")
             if not DATE.fullmatch(meta["date"]):
                 raise ValueError("date must be YYYY-MM-DD")
             if meta["draft"] not in ("true", "false") or meta["reviewed"] not in ("true", "false"):
@@ -68,6 +74,12 @@ def main() -> int:
                 published += 1
         except (OSError, UnicodeError, ValueError) as exc:
             errors.append(f"{relative}: {exc}")
+
+    for readme in sorted(ROOT.rglob("README.md")):
+        if any(part.startswith(".") for part in readme.relative_to(ROOT).parts):
+            continue
+        if HANGUL.search(readme.read_text(encoding="utf-8")):
+            errors.append(f"{readme.relative_to(ROOT)}: README files must be English")
 
     for error in errors:
         print("ERROR:", error, file=sys.stderr)

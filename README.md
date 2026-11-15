@@ -1,36 +1,92 @@
 # Systems Notes
 
-A personal repository for studying algorithms, system programming, operating systems, storage, and computer architecture. I write these notes primarily so I can **come back later and understand what I learned**.
+A public, versioned notebook for my study of **operating systems, Linux internals, file systems, storage, computer architecture, system programming, algorithms, and graduate research**.
 
-## Language and organization
+The primary goal is to retain explanations, examples, experiments, and questions that I can return to later. The repository is the **source of truth** for the [Notes section of my website](https://petooooo.github.io/notes/). My engineering projects and career information remain in the [portfolio](https://petooooo.github.io/projects/).
 
-**README files, directory names, categories, tags, and other metadata are in English. Article titles, summaries, and main text are in Korean.** Keep technical terms, identifiers, code and paper titles in their original language when that is clearer.
+## Language convention
 
-| Area | Focus |
+| Content | Language |
 | --- | --- |
-| [Algorithms](notes/algorithms/) | Data structures, coding interviews, complexity, mistakes and counterexamples |
-| [System Programming](notes/system-programming/) | C/C++, POSIX, processes, threads, IPC, files and sockets |
-| [Undergraduate Courses](notes/undergraduate/) | OS, computer architecture, networking, databases and digital systems |
-| [Linux Kernel](notes/linux-kernel/) | Scheduling, memory, tracing and drivers |
-| [Storage & File Systems](notes/storage/) | VFS, EXT4/F2FS, NVMe, flash, persistent I/O |
-| [Graduate Study](notes/graduate/) | Upcoming KAIST classes, paper reading, reproducible experiments |
+| README files, directory names, navigation, documentation | **English** |
+| Metadata fields, `slug`, `area`, `category`, `type`, `series`, tags | **English** |
+| Study article **titles and descriptions** | **Korean** |
+| Study article **explanations and main body** | **Korean** |
+| Code, identifiers, commands, standards, paper titles | Original technical language |
 
-Explanations live in [`notes/`](notes/); runnable implementations and tests live in [`labs/`](labs/). A [study roadmap](notes/study-roadmap.mdx) describes topics to work through, **not work already completed**.
+This convention applies to **new and edited notes**. Existing older notes may have been written before it was established; they can be improved gradually without changing their URLs.
 
-## Writing a note
+## Read the notes
 
-1. Copy the [concept](notes/_templates/note.mdx), [algorithm](notes/_templates/algorithm.mdx) or [experiment](notes/_templates/experiment.mdx) template into an appropriate topic directory.
-2. Write the `title`, `description` and article body in Korean. Use English for `area`, `category`, `type`, `tags` and a unique `study-` slug.
-3. Keep `draft: true` and `reviewed: false` while writing.
-4. Check accuracy, references and disclosure risk before setting `draft: false`, `reviewed: true`, `sensitivity: public`.
-5. Push the change. A website build imports reviewed, public notes.
+| Track | Contents |
+| --- | --- |
+| [Study Roadmap](notes/study-roadmap.mdx) | Detailed preparation for KAIST OS Lab, with weekly milestones, experiments, paper reading, and interview preparation |
+| [KDT Linux Course](notes/linux-kernel/kdt-overview.mdx) | A six-article learning series on Linux/POSIX, scheduling, VM, VFS, drivers, crash analysis, and observability |
+| [System Programming](notes/system-programming/) | POSIX processes, threads, synchronization, IPC, sockets and event-driven I/O |
+| [Linux Kernel](notes/linux-kernel/) | Scheduler, memory management, tracing, debugging, interrupt and driver internals |
+| [Storage & File Systems](notes/storage/) | VFS, ext4/F2FS, page cache, writeback, block I/O, NVMe, flash and ZNS |
+| [Algorithms](notes/algorithms/) | Data structures, patterns, coding-test solutions and complexity analysis |
+| [Undergraduate Courses](notes/undergraduate/) | Computer science, computer architecture, networking, digital hardware and related coursework |
+| [Graduate Study](notes/graduate/) | Graduate coursework, paper reviews, reproductions, and public research notes |
 
-See [writing guidelines](docs/WRITING.md) for details.
+### KDT Linux systems series
 
-> **Public repository:** Draft notes are visible on GitHub even when they are not published on the website. Never add confidential military infrastructure details, private lab material, personal data, credentials, copyrighted course content or secrets.
+- [Course overview](notes/linux-kernel/kdt-overview.mdx)
+- [POSIX programming, IPC and sockets](notes/system-programming/kdt-posix.mdx)
+- [Scheduler, virtual memory, VFS and storage](notes/linux-kernel/kdt-kernel-vfs-memory.mdx)
+- [Embedded Linux and drivers](notes/linux-kernel/kdt-embedded-linux.mdx)
+- [Kernel crash dump analysis](notes/linux-kernel/kdt-crash-dump.mdx)
+- [eBPF, BCC, tracing and monitoring](notes/linux-kernel/kdt-ebpf-observability.mdx)
 
-## Website integration
+Diagrams used in this series are versioned in [assets/kdt](assets/kdt/), alongside their source articles.
 
-The website at [petooooo.github.io/notes/](https://petooooo.github.io/notes/) reads this repository at build time. A scheduled GitHub Actions workflow refreshes the imported notes approximately hourly; the schedule can be delayed. You can trigger the website's deployment workflow manually for a faster update.
+## Repository layout
 
-**Edit study notes here**, not in the website source. Change the website repository only for presentation, navigation, the CV or engineering portfolio content.
+```text
+systems-notes/
+├── README.md
+├── docs/
+│   └── WRITING.md
+├── notes/
+│   ├── study-roadmap.mdx
+│   ├── linux-kernel/
+│   ├── storage/
+│   ├── system-programming/
+│   ├── algorithms/
+│   ├── undergraduate/
+│   ├── graduate/
+│   └── _templates/
+├── assets/
+│   └── kdt/
+├── labs/
+│   ├── algorithms/
+│   ├── system-programming/
+│   ├── kernel/
+│   └── storage/
+└── scripts/
+    └── validate-notes.py
+```
+
+**Notes** explain concepts and reasoning. **Labs** contain runnable code, test inputs, measured output and reproducible instructions. A conceptual example in a note is not an assertion that a separate lab was executed.
+
+## Add or revise a note
+
+1. Choose a topic folder under `notes/` and copy a template from [notes/_templates](notes/_templates/).
+2. Write `title`, `description`, and the main text in Korean.
+3. Use a unique English `study-...` slug and English labels/tags.
+4. Include definitions, mechanism, examples, failure cases, confusing distinctions, sources, and your own follow-up questions.
+5. Keep `draft: true` and `reviewed: false` until the article is checked.
+6. Validate locally with `python3 scripts/validate-notes.py`.
+7. Publish with `draft: false`, `reviewed: true`, and `sensitivity: public`.
+
+See [the writing guide](docs/WRITING.md) for the detailed editorial template.
+
+## Website publication
+
+The portfolio's GitHub Actions workflow checks out this repository, validates it, and imports only reviewed public notes at build time. The website is refreshed after portfolio pushes and by a scheduled workflow (approximately hourly, subject to GitHub scheduling delays). A new note should normally be **edited here first**, never copied manually into the website's source.
+
+- Source repository: [Petooooo/systems-notes](https://github.com/Petooooo/systems-notes)
+- Website Notes: [petooooo.github.io/notes/](https://petooooo.github.io/notes/)
+- Portfolio Projects: [petooooo.github.io/projects/](https://petooooo.github.io/projects/)
+
+> **Disclosure:** This repository is public, including drafts. Do not commit passwords, credentials, internal military infrastructure details, unpublished laboratory materials, non-public data, or copyrighted lecture files. Keep unreviewed sensitive information in a private location.

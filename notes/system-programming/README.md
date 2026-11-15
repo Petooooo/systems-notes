@@ -1,5 +1,8 @@
 # System Programming
 
-Study C/C++ and POSIX interfaces: files, processes, threads, synchronization, signals, IPC, memory mapping, sockets and event-oriented I/O.
+C/C++ and POSIX study: processes, threads, file descriptors, synchronization, signals, memory mapping, inter-process communication, sockets and event-driven I/O.
 
-Connect concept notes with runnable examples in [labs/system-programming](../../labs/system-programming/). Record the compiler, OS, build commands and what actually happened.
+- [Detailed POSIX course note](kdt-posix.mdx)
+- [Reproducible system programming labs](../../labs/system-programming/)
+
+Keep conceptual explanations in Korean articles and code/results in labs. All README files and metadata remain in English.
