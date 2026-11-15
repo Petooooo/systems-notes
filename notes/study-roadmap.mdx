@@ -1,34 +1,38 @@
 ---
-title: "Study roadmap"
-description: "How I am organizing algorithm practice, systems programming, coursework, and upcoming graduate study."
+title: "학습 로드맵"
+description: "코딩테스트, 시스템 프로그래밍, 학부 전공 복습과 앞으로의 대학원 공부를 어떻게 정리할지 기록한 계획."
 date: "2026-11-15"
 draft: false
 reviewed: true
 sensitivity: public
 slug: "study-roadmap"
-area: "Study Roadmap"
+area: "학습 로드맵"
 type: "concept"
 tags: ["learning", "algorithms", "systems", "graduate-study"]
 ---
 
-This is a working index of **subjects I plan to review or study**, not a list of completed work.
+이 문서는 앞으로 공부할 주제를 정리한 **개인 학습 계획**이다. 여기 적혀 있다는 것만으로 학습·실험·구현을 완료했다는 뜻은 아니다.
 
-## Algorithms & coding tests
+## 알고리즘과 코딩테스트
 
-Data structures, graph traversal, dynamic programming, greedy algorithms, complexity analysis, and problem-solving practice. Solutions and tests live separately in the [GitHub study repository](https://github.com/Petooooo/systems-notes/tree/main/labs/algorithms).
+자료구조, 시간 복잡도, DFS/BFS, 최단 경로, 동적 계획법(DP), 그리디, 문자열 알고리즘을 공부한다.
 
-## Systems programming
+- 문제별 풀이와 테스트 코드는 [알고리즘 실습 저장 영역](https://github.com/Petooooo/systems-notes/tree/main/labs/algorithms)에 둔다.
+- 풀이에는 접근 방법, 복잡도, 반례, 오답 원인을 기록한다.
+- 개념은 [알고리즘 노트](https://github.com/Petooooo/systems-notes/tree/main/notes/algorithms)에 따로 정리한다.
 
-C/C++, POSIX APIs, process/thread lifecycle, synchronization, IPC, sockets, and file I/O. For each topic, I want to pair conceptual notes with small, reproducible programs.
+## 시스템 프로그래밍
 
-## Computer science foundations
+C/C++와 POSIX 기반 시스템 콜, 프로세스·스레드, 시그널, 동기화, IPC, 소켓, 파일 I/O, `mmap` 등을 복습하고 작은 프로그램으로 확인한다. **공부 내용과 실행 코드를 연결해서 기록**하는 것이 목표다.
 
-Revisit relevant undergraduate topics: operating systems, computer architecture, computer networks, databases, and hardware/software interfaces.
+## 학부 전공 복습
 
-## Linux, storage & memory
+운영체제, 컴퓨터구조, 네트워크, 데이터베이스, 디지털 회로, 메모리와 하드웨어/소프트웨어 인터페이스를 필요에 따라 다시 정리한다. 이해를 돕는 도식이나 예제는 직접 작성한다.
 
-Focus on kernel execution, VFS and file systems, page cache, block I/O, flash/SSD, NVMe, memory management, and performance analysis.
+## Linux 커널과 파일시스템·스토리지
 
-## Graduate study
+프로세스 스케줄링, 가상 메모리, VFS, page cache, block I/O, ext4/F2FS, Flash/SSD, NVMe, ZNS, 성능 관측을 중심으로 개념을 정리한다. 실습하게 된다면 **환경과 재현 방법, 측정값의 한계**를 기록한다.
 
-As I begin my KAIST master's program in spring 2027, I plan to add course notes and reproducible systems experiments. Research and laboratory material will be shared only when appropriate for public release.
+## KAIST 대학원 공부
+
+2027년 봄학기 석사과정에 진학하면 새로 배우는 과목, 읽은 논문, 공개 가능한 재현 실험을 정리할 계획이다. 연구실 내부 자료나 공개되지 않은 연구 결과는 사전 허용 없이 게시하지 않는다.

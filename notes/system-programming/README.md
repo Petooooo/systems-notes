@@ -1,5 +1,5 @@
-# Systems programming
+# 시스템 프로그래밍
 
-Working topics: Linux system calls, process lifecycle, signals, threads, synchronization, IPC, file I/O, memory mapping, sockets, and asynchronous I/O.
+Linux 시스템 콜, 프로세스와 스레드, 시그널, 동기화, IPC, 파일 I/O, `mmap`, `epoll`, 소켓 통신, C/C++ 시스템 프로그래밍 등을 공부한다.
 
-Use [labs/system-programming](../../labs/system-programming/) for compilable programs and experiment instructions.
+각 개념을 설명하는 노트와 [실행 가능한 실습 코드](../../labs/system-programming/)를 연결해 두고, 빌드 명령어와 실제 관찰 결과도 기록한다.

@@ -1,5 +1,5 @@
-# Graduate coursework and research preparation
+# 대학원 공부
 
-Future course notes, paper reading, experimental methodology, and systems research preparation.
+2027년 봄학기 KAIST 석사 진학 이후 수강 과목, 논문 읽기, 연구 준비 및 재현 가능한 시스템 실험 내용을 정리할 공간이다.
 
-Do not publish confidential lab discussions, unpublished results, restricted course materials, or collaborators' work without permission. A planned project is not a completed result.
+연구실의 미공개 결과, 내부 자료, 비공개 회의 내용, 타인의 연구 성과나 재배포 권한이 없는 강의자료는 허락 없이 공개하지 않는다. 예정된 연구와 완료된 결과는 명확하게 구분한다.

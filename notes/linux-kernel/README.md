@@ -1,5 +1,5 @@
-# Linux kernel
+# Linux 커널
 
-Potential study topics: process scheduling, context switches, interrupts, page tables, memory allocation, VFS, device drivers, tracepoints, eBPF, ftrace and kernel debugging.
+프로세스 스케줄링, 인터럽트, 가상 메모리, VFS, 커널 자료구조, 디바이스 드라이버, `ftrace`, `eBPF`, 디버깅 등을 정리한다.
 
-Distinguish **reading**, **reproducing** and **implementing**; only report benchmarks when measured. Runnable experiments belong in [labs/kernel](../../labs/kernel/).
+**문서로 학습한 것, 예제를 재현한 것, 직접 구현한 것**을 구분한다. 실습은 [labs/kernel](../../labs/kernel/)에 두고 커널 버전과 재현 방법을 기록한다.

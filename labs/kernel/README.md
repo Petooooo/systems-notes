@@ -1,5 +1,5 @@
-# Kernel experiments
+# 커널 실습
 
-Use reproducible experiments for kernel tracing, scheduling, memory or device-driver exercises.
+커널 tracing, 스케줄링, 메모리 관리, 드라이버 등 작은 실험을 재현 가능한 형태로 정리한다.
 
-Prefer a safe test kernel/VM or disposable environment for crash-prone modules; never assume a kernel experiment is safe on the machine hosting important services. Document exact kernel versions.
+커널 모듈처럼 시스템에 영향을 줄 수 있는 실험은 중요한 서비스를 운영하는 호스트에서 직접 실행하지 않고, 별도 테스트 환경에서 검증한다. 정확한 커널 버전과 설정을 남긴다.

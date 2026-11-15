@@ -1,5 +1,5 @@
-# Algorithms and coding tests
+# 알고리즘·코딩테스트
 
-Organize notes by concept and pattern: complexity, data structures, graphs, dynamic programming, greedy, strings, math. Put tested solutions in [labs/algorithms](../../labs/algorithms/). Link problems to their original source; do not copy full copyrighted problem statements.
+시간 복잡도, 자료구조, 그래프 탐색, 최단 경로, 그리디, DP, 문자열 알고리즘 등 문제 풀이에 필요한 개념을 정리한다.
 
-Suggested note format: problem pattern → reasoning → complexity → counterexamples → pitfalls.
+풀이 코드는 [labs/algorithms](../../labs/algorithms/)에 둔다. 노트에는 **문제 링크 → 접근 방식 → 복잡도 → 반례 → 틀린 이유 → 다시 기억할 핵심**을 기록한다. 문제 원문 전체는 복제하지 않는다.

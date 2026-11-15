@@ -1,10 +1,10 @@
-# Labs
+# 실습 코드
 
-Each exercise should have its own directory with source files, a minimal build/run command, expected outcome, and a short note on what actually happened. Avoid committing compiled binaries and datasets with unclear licenses.
+공부 노트는 [notes/](../notes/)에, **실행 가능한 코드·테스트·재현 실험**은 이 폴더에 기록한다.
 
-- [Algorithms](algorithms/) — coding-test solutions and tests
-- [Systems programming](system-programming/) — POSIX/C/C++ programs
-- [Kernel](kernel/) — kernel-oriented experiments in safe, isolated environments
-- [Storage](storage/) — benchmarks and file-system behavior experiments
+- [알고리즘 풀이](algorithms/) — 코딩테스트 풀이 및 테스트
+- [시스템 프로그래밍](system-programming/) — POSIX·C/C++ 실습
+- [커널 실습](kernel/) — 커널 tracing, 스케줄러, 메모리 실험
+- [스토리지 실습](storage/) — 파일시스템 및 I/O 측정
 
-Not all folders are populated yet; this is the workspace structure.
+각 실습에는 실행 환경, 빌드·실행 명령어, 기대 결과, 실제 결과를 남긴다. 아직 내용이 없는 폴더는 앞으로 사용할 작업 공간이다.

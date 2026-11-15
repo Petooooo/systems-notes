@@ -1,3 +1,5 @@
-# Storage experiments
+# 스토리지 실험
 
-Explore I/O behavior and file-system performance with controlled environments and clear measurements. Record filesystem/device type, mount options, cache effects, tool versions and data sizes. Avoid destructive tests on disks with important data.
+파일시스템 동작, I/O 경로, 성능 측정 등을 안전한 테스트 환경에서 확인한다.
+
+저장장치 종류, 파일시스템, 마운트 옵션, 캐시 효과, 데이터 크기와 측정 방법을 함께 기록한다. 중요한 데이터가 있는 디스크에서 파괴적인 테스트를 하지 않는다.

@@ -1,8 +1,9 @@
-# Algorithm practice
+# 코딩테스트 풀이
 
-One folder per problem, such as `<platform>/<problem-id>/`, containing:
-- `solution.cpp` or `solution.py`
-- `README.md`: original problem link, approach, complexity, pitfalls
-- `tests/`: minimal sample and edge cases
+문제마다 `<플랫폼>/<문제번호>/` 폴더를 만들고 풀이 코드와 간단한 기록을 남긴다.
 
-Keep original problem statements on the provider's site.
+- `solution.cpp` 또는 `solution.py`: 실제 풀이
+- `README.md`: 문제 링크, 아이디어, 복잡도, 반례, 오답 원인
+- `tests/`: 테스트 입력과 엣지 케이스
+
+원본 문제 전문은 제공 사이트의 링크로 대신한다.
