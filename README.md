@@ -2,18 +2,18 @@
 
 알고리즘, 컴퓨터공학 기초, 시스템 프로그래밍, Linux 커널과 스토리지, 대학원 공부를 정리하는 **개인 학습 저장소**다. 다른 사람이 읽는 포트폴리오이기도 하지만, 가장 중요한 목적은 나중에 내가 다시 읽고 이해할 수 있게 공부한 내용을 남기는 것이다.
 
-**공부 노트는 한국어를 기본으로 작성**한다. 함수명·시스템 콜·커널 구조체·논문명처럼 영어가 정확한 기술 용어는 원문을 유지한다.
+**글 제목·설명·본문은 한국어**, **카테고리(`area`, `category`)와 태그는 영어**를 기본으로 작성한다. 함수명·시스템 콜·커널 구조체·논문명은 원문 표기를 유지한다.
 
 ## 공부 분야
 
-| 분류 | 정리할 내용 |
+| Category | 정리할 내용 |
 | --- | --- |
-| [알고리즘·코딩테스트](notes/algorithms/) | 자료구조, 시간 복잡도, 문제 풀이 패턴, 오답 및 반례 |
-| [시스템 프로그래밍](notes/system-programming/) | C/C++, POSIX, 프로세스, 스레드, IPC, 동기화, 소켓 |
-| [학부 전공 복습](notes/undergraduate/) | 운영체제, 컴퓨터구조, 네트워크, 데이터베이스, 디지털 회로 |
-| [Linux 커널](notes/linux-kernel/) | 스케줄링, 가상 메모리, 커널 분석, 드라이버, tracing |
-| [파일시스템·스토리지](notes/storage/) | VFS, ext4/F2FS, SSD·Flash, NVMe, I/O 경로 |
-| [대학원 공부](notes/graduate/) | KAIST 수업, 논문 읽기, 재현 실험, 연구 준비 |
+| [Algorithms](notes/algorithms/) | 자료구조, 시간 복잡도, 문제 풀이 패턴, 오답 및 반례 |
+| [System Programming](notes/system-programming/) | C/C++, POSIX, 프로세스, 스레드, IPC, 동기화, 소켓 |
+| [Undergraduate Courses](notes/undergraduate/) | 운영체제, 컴퓨터구조, 네트워크, 데이터베이스, 디지털 회로 |
+| [Linux Kernel](notes/linux-kernel/) | 스케줄링, 가상 메모리, 커널 분석, 드라이버, tracing |
+| [Storage & File Systems](notes/storage/) | VFS, ext4/F2FS, SSD·Flash, NVMe, I/O 경로 |
+| [Graduate Study](notes/graduate/) | KAIST 수업, 논문 읽기, 재현 실험, 연구 준비 |
 
 글은 [`notes/`](notes/)에, 실제 코드·테스트·실험은 [`labs/`](labs/)에 보관한다. 실습 코드는 실행 방법과 결과를 함께 기록하는 것을 원칙으로 한다.
 

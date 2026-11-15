@@ -6,7 +6,7 @@
 
 1. `notes/algorithms`, `notes/system-programming`, `notes/undergraduate`, `notes/linux-kernel`, `notes/storage`, `notes/graduate`에서 적절한 폴더를 고른다.
 2. `notes/_templates/`에 있는 일반 노트·알고리즘 풀이·실험 기록 템플릿을 복사한다.
-3. `slug`는 중복되지 않게 **영문 소문자 `study-` 접두사**로 만든다. 제목과 설명은 한국어로 작성해도 된다.
+3. `slug`는 중복되지 않게 **영문 소문자 `study-` 접두사**로 만든다. **`area`·`category`·`type`·`tags`는 영어**, `title`·`description` 및 본문은 한국어로 작성한다.
 4. 기록 내용에는 학습한 개념, 사용한 환경, 예제나 코드, 직접 관찰한 결과, 미해결 질문, 참고 출처를 담는다.
 5. 작성 중에는 `draft: true`, `reviewed: false`로 둔다.
 6. 안전성과 정확성을 검토한 뒤 `draft: false`, `reviewed: true`, `sensitivity: public`으로 설정한다.

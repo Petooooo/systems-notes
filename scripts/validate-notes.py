@@ -8,10 +8,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 NOTES = ROOT / "notes"
-REQUIRED = ("title", "description", "date", "slug", "area", "draft", "reviewed", "sensitivity")
+REQUIRED = ("title", "description", "date", "slug", "area", "category", "draft", "reviewed", "sensitivity")
 KEY = re.compile(r"^([A-Za-z][A-Za-z0-9_-]*):\s*(.*?)\s*$")
 SLUG = re.compile(r"^study-[a-z0-9]+(?:-[a-z0-9]+)*$")
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+ENGLISH_LABEL = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 ./&+()_-]*$")
 
 
 def fields(path: Path) -> dict[str, str]:
@@ -52,6 +53,9 @@ def main() -> int:
             if slug in seen:
                 raise ValueError(f"duplicate slug also used in {seen[slug]}")
             seen[slug] = str(relative)
+            for label in ("area", "category"):
+                if not ENGLISH_LABEL.fullmatch(meta[label]):
+                    raise ValueError(f"{label} must be an English category label")
             if not DATE.fullmatch(meta["date"]):
                 raise ValueError("date must be YYYY-MM-DD")
             if meta["draft"] not in ("true", "false") or meta["reviewed"] not in ("true", "false"):
