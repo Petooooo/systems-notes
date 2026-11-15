@@ -1,5 +1,5 @@
-# 학부 전공 복습
+# Undergraduate Courses
 
-컴퓨터공학·전자공학 복수전공 과정에서 배운 운영체제, 컴퓨터구조, 네트워크, 데이터베이스, 디지털 회로, 하드웨어/소프트웨어 인터페이스 등을 필요할 때 다시 정리한다.
+Review material from computer science and electronic engineering: operating systems, computer architecture, networking, databases, digital logic and hardware/software interfaces.
 
-내가 이해한 내용을 한국어로 설명하고, 참고 출처를 명확하게 남긴다. 공개가 허용되지 않은 강의자료·교재·과제 원문은 업로드하지 않는다.
+Explain concepts in your own Korean words and cite sources. Do not upload restricted lecture notes or copyrighted course materials.

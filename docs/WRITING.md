@@ -1,31 +1,38 @@
-# 공부 노트 작성·공개 규칙
+# Writing and publishing guidelines
 
-이 저장소는 나중에 **내가 다시 읽고 이해할 수 있는 기록**을 남기는 곳이다. 공부 노트의 본문·정리·결론은 한국어를 기본으로 사용한다. 다만 코드 식별자, 명령어, 커널 함수, 논문 제목은 정확한 원문을 유지한다.
+This repository is a learning record, not a place to invent completed experiments or rewrite a course as personal research.
 
-## 작성 흐름
+## Language
 
-1. `notes/algorithms`, `notes/system-programming`, `notes/undergraduate`, `notes/linux-kernel`, `notes/storage`, `notes/graduate`에서 적절한 폴더를 고른다.
-2. `notes/_templates/`에 있는 일반 노트·알고리즘 풀이·실험 기록 템플릿을 복사한다.
-3. `slug`는 중복되지 않게 **영문 소문자 `study-` 접두사**로 만든다. **`area`·`category`·`type`·`tags`는 영어**, `title`·`description` 및 본문은 한국어로 작성한다.
-4. 기록 내용에는 학습한 개념, 사용한 환경, 예제나 코드, 직접 관찰한 결과, 미해결 질문, 참고 출처를 담는다.
-5. 작성 중에는 `draft: true`, `reviewed: false`로 둔다.
-6. 안전성과 정확성을 검토한 뒤 `draft: false`, `reviewed: true`, `sensitivity: public`으로 설정한다.
+- **English:** README files, directory names, metadata fields, `area`, `category`, `type`, `tags`, and slugs.
+- **Korean:** Article `title`, `description`, body, explanations and conclusions.
+- **Original language where appropriate:** Code identifiers, system calls, command output, function names, standards, paper titles and quoted source terms.
 
-GitHub Actions가 날짜·slug 중복·공개 설정을 검사한다. 개인 사이트는 이 세 공개 조건이 모두 만족된 글만 가져온다.
+## Process
 
-**매우 중요:** 이 저장소는 **Public**이므로 초안도 GitHub에서 공개된다. 비공개 강의 자료, 논문 비공개 초안, 군 내부 호스트·설정·구성, 실명/계정·토큰·접속 정보 등은 이 저장소에 올리지 않는다.
+1. Choose the correct topic under `notes/`.
+2. Start from a template in `notes/_templates/`.
+3. Use a unique lower-case `study-` slug.
+4. State the question, your understanding, sources, examples, verified observations and unresolved questions.
+5. Use `draft: true` while working. This prevents website publication, **not GitHub visibility**.
+6. After review, set `draft: false`, `reviewed: true`, `sensitivity: public`.
 
-## 좋은 노트의 기준
+The CI validator checks required metadata, date formats, unique slugs and English category labels.
 
-- **개념 정리:** 무엇이 궁금했는지 → 핵심 개념 → 예제 → 헷갈린 부분 → 내 언어로 다시 설명 → 참고자료
-- **알고리즘:** 원본 문제 링크·번호 → 접근 방식 → 시간/공간 복잡도 → 코드 → 반례 → 오답 원인
-- **시스템 실험:** OS/커널 버전 → 재현 절차·명령어 → 예상 결과 → 실제 결과 → 측정 조건·한계
-- **논문 읽기:** 연구 문제 → 핵심 아이디어 → 평가 환경 → 한계·의문 → 내가 이해한 내용
+## A useful study note
 
-강의에서 배운 내용과 **직접 구현·측정한 성과**를 혼동하지 않는다. 확인하지 않은 내용은 가설 또는 향후 계획으로 표시한다.
+**Concept:** Question → definition → mechanism → example → confusing points → sources.
 
-## 개인 사이트 게시
+**Algorithm:** Problem link → approach → complexity → code → counterexamples → mistakes → takeaway.
 
-웹사이트 저장소 `Petooooo.github.io`의 GitHub Actions가 공부 저장소를 체크아웃하고 검증을 통과한 공개 노트를 `/notes/` 페이지로 가져온다. 원본은 계속 여기서 수정하며 사이트에는 생성된 복사본을 커밋하지 않는다.
+**Systems experiment:** OS/kernel and hardware versions → reproducible commands → hypothesis → actual measurements → limitations.
 
-사이트는 대략 매시간 동기화되지만 실행이 지연될 수 있다. 급하면 사이트 저장소의 `Deploy GitHub Pages` 워크플로에서 `Run workflow`를 선택한다. **노트 내용만 바꿀 때는 사이트 소스를 직접 고치지 않는다.**
+**Paper review:** Research problem → approach → evaluated workload → findings → limitations → your own questions.
+
+Clearly distinguish reading, implementing and measuring. Do not claim a project, kernel patch, benchmark, lab experiment or publication that has not been completed and verified.
+
+## Publication and sensitive information
+
+This repository is **public even for drafts**. Never include internal endpoints, private policies, secrets, military system topology, confidential lab research, unrelated personal data, or copyrighted lecture material. If in doubt, keep the information in a separate private location.
+
+The website imports only entries marked `draft: false`, `reviewed: true`, and `sensitivity: public`. Its generated copies should not be committed manually.

@@ -1,5 +1,5 @@
-# 시스템 프로그래밍
+# System Programming
 
-Linux 시스템 콜, 프로세스와 스레드, 시그널, 동기화, IPC, 파일 I/O, `mmap`, `epoll`, 소켓 통신, C/C++ 시스템 프로그래밍 등을 공부한다.
+Study C/C++ and POSIX interfaces: files, processes, threads, synchronization, signals, IPC, memory mapping, sockets and event-oriented I/O.
 
-각 개념을 설명하는 노트와 [실행 가능한 실습 코드](../../labs/system-programming/)를 연결해 두고, 빌드 명령어와 실제 관찰 결과도 기록한다.
+Connect concept notes with runnable examples in [labs/system-programming](../../labs/system-programming/). Record the compiler, OS, build commands and what actually happened.

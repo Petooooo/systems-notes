@@ -1,5 +1,5 @@
-# 커널 실습
+# Linux Kernel Labs
 
-커널 tracing, 스케줄링, 메모리 관리, 드라이버 등 작은 실험을 재현 가능한 형태로 정리한다.
+Record kernel tracing, scheduling, memory and driver experiments with precise kernel versions and reproducible commands.
 
-커널 모듈처럼 시스템에 영향을 줄 수 있는 실험은 중요한 서비스를 운영하는 호스트에서 직접 실행하지 않고, 별도 테스트 환경에서 검증한다. 정확한 커널 버전과 설정을 남긴다.
+Use isolated test environments for crash-prone modules or destructive operations, never important production systems.

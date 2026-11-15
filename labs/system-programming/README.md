@@ -1,5 +1,5 @@
-# 시스템 프로그래밍 실습
+# System Programming Labs
 
-프로세스, 스레드, 동기화, IPC, `mmap`, 파일 I/O, 소켓 등 개념별로 작은 C/C++ 실습을 만든다.
+Small C/C++ exercises about processes, threads, synchronization, IPC, signals, memory mapping and sockets.
 
-사용한 컴파일러, OS/커널 버전, 빌드 명령어, 예상 동작, 실제 결과를 함께 기록해 나중에 다시 재현할 수 있도록 한다.
+Document the OS/kernel, compiler, flags, commands and actually observed behavior.

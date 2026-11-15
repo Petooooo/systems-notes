@@ -1,10 +1,10 @@
-# 실습 코드
+# Reproducible Labs
 
-공부 노트는 [notes/](../notes/)에, **실행 가능한 코드·테스트·재현 실험**은 이 폴더에 기록한다.
+Keep executable code and tests here; conceptual explanations belong in [notes/](../notes/).
 
-- [알고리즘 풀이](algorithms/) — 코딩테스트 풀이 및 테스트
-- [시스템 프로그래밍](system-programming/) — POSIX·C/C++ 실습
-- [커널 실습](kernel/) — 커널 tracing, 스케줄러, 메모리 실험
-- [스토리지 실습](storage/) — 파일시스템 및 I/O 측정
+- [Algorithms](algorithms/) — coding-test code and tests
+- [System Programming](system-programming/) — C/C++ and POSIX exercises
+- [Linux Kernel](kernel/) — tracing and kernel experiments
+- [Storage](storage/) — filesystem and I/O experiments
 
-각 실습에는 실행 환경, 빌드·실행 명령어, 기대 결과, 실제 결과를 남긴다. 아직 내용이 없는 폴더는 앞으로 사용할 작업 공간이다.
+Record prerequisites, build/run commands, expected results, actual observations and limitations. Empty folders are placeholders, not completed work.

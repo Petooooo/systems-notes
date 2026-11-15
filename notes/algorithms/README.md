@@ -1,5 +1,5 @@
-# 알고리즘·코딩테스트
+# Algorithms
 
-시간 복잡도, 자료구조, 그래프 탐색, 최단 경로, 그리디, DP, 문자열 알고리즘 등 문제 풀이에 필요한 개념을 정리한다.
+Keep data-structure notes, patterns, complexity analysis and coding-test mistakes here.
 
-풀이 코드는 [labs/algorithms](../../labs/algorithms/)에 둔다. 노트에는 **문제 링크 → 접근 방식 → 복잡도 → 반례 → 틀린 이유 → 다시 기억할 핵심**을 기록한다. 문제 원문 전체는 복제하지 않는다.
+Problem solutions belong in [labs/algorithms](../../labs/algorithms/). For each problem, record the source link, approach, complexity, tested edge cases and what you would recognize next time. Avoid copying the entire problem statement.

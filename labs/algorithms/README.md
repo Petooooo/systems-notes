@@ -1,9 +1,5 @@
-# 코딩테스트 풀이
+# Algorithm Solutions
 
-문제마다 `<플랫폼>/<문제번호>/` 폴더를 만들고 풀이 코드와 간단한 기록을 남긴다.
+Organize solutions by source and problem ID. Include the problem link, approach, complexity, edge cases and debugging notes.
 
-- `solution.cpp` 또는 `solution.py`: 실제 풀이
-- `README.md`: 문제 링크, 아이디어, 복잡도, 반례, 오답 원인
-- `tests/`: 테스트 입력과 엣지 케이스
-
-원본 문제 전문은 제공 사이트의 링크로 대신한다.
+Avoid copying complete copyrighted problem statements.
