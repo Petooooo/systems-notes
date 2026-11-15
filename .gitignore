@@ -1,0 +1,36 @@
+# Local editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Compiled code, debugging and benchmark artifacts
+__pycache__/
+*.pyc
+build/
+bin/
+obj/
+*.o
+*.a
+*.so
+*.out
+*.exe
+*.gcda
+*.gcno
+core
+core.*
+*.profraw
+*.profdata
+*.log
+*.trace
+*.pcap
+
+# Secrets and private local material
+.env
+.env.*
+!.env.example
+private/
+scratch/
+secrets/
