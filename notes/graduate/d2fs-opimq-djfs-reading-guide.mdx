@@ -12,7 +12,7 @@ type: "concept"
 tags: ["d2fs", "opimq", "djfs", "fast", "io-ordering"]
 ---
 
-## 1. 같은 저장장치에서 다른 병목을 다루는 방법
+## 같은 저장장치에서 다른 병목을 다루는 방법
 
 **D2FS, OPIMQ, DJFS**는 모두 FAST 2025에 발표된 연구지만, 다루는 병목이 다르다. 하나는 GC의 위치를 바꾸고, 하나는 다중 큐에서 쓰기 순서를 보존하며, 하나는 journaling transaction의 단위를 재설계한다.
 
@@ -24,7 +24,7 @@ tags: ["d2fs", "opimq", "djfs", "fast", "io-ordering"]
 
 ![스토리지 논문을 문제와 메커니즘으로 연결한 학습 지도](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/roadmap/paper-map.svg)
 
-## 2. D2FS의 출발점: 누가 GC를 수행하는가?
+## D2FS의 출발점: 누가 GC를 수행하는가?
 
 D2FS의 공개 Abstract는 **Flash 장치 내부의 GC 기능을 활용해 파일시스템의 GC 부담을 줄이려는 방향**을 설명한다.
 
@@ -36,7 +36,7 @@ D2FS의 공개 Abstract는 **Flash 장치 내부의 GC 기능을 활용해 파�
 
 이 이름들을 암기하는 것보다 먼저 **파일시스템과 FTL이 각각 어떤 정보를 알고 있으며, 데이터가 이동하면 양쪽 metadata를 어떻게 일치시키는지**를 이해해야 한다.
 
-## 3. OPIMQ: 여러 큐가 왜 순서를 어렵게 만드는가?
+## OPIMQ: 여러 큐가 왜 순서를 어렵게 만드는가?
 
 NVMe와 blk-mq는 높은 병렬성을 제공하지만, 명령이 서로 다른 queue에서 처리되면 **애플리케이션의 논리적 쓰기 순서를 그대로 저장장치가 지켜준다고 가정할 수 없다**.
 
@@ -49,7 +49,7 @@ OPIMQ의 공개 Abstract는 네 요소를 제시한다.
 
 각 메커니즘이 intra-stream 또는 inter-stream 순서를 어떤 방식으로 다루는지 본문에서 확인해야 한다. 특히 **Block request completion과 durable storage order가 다를 수 있음**을 이해하는 것이 출발점이다.
 
-## 4. DJFS: Journaling transaction의 granularity
+## DJFS: Journaling transaction의 granularity
 
 DJFS는 **per-directory transaction**을 통해 journaling의 contention과 commit 병렬성을 개선하려는 연구다. 공개 소개의 핵심 요소는 다음과 같다.
 
@@ -59,7 +59,7 @@ DJFS는 **per-directory transaction**을 통해 journaling의 contention과 comm
 
 왜 디렉터리 단위로 묶으면 유리할 수 있는지, cross-directory rename 등 관계가 복잡한 상황에서는 어떻게 일관성을 보존하는지를 집중해서 읽고 싶다.
 
-## 5. 공통으로 확인할 파일시스템 개념
+## 공통으로 확인할 파일시스템 개념
 
 | 배경 개념 | D2FS | OPIMQ | DJFS |
 | --- | --- | --- | --- |
@@ -69,7 +69,7 @@ DJFS는 **per-directory transaction**을 통해 journaling의 contention과 comm
 | Crash consistency | Mapping update의 복구 | Persistent order | Journal correctness |
 | Performance | GC overhead | Ordering overhead | Lock contention |
 
-## 6. Baseline과 workload를 검토하기
+## Baseline과 workload를 검토하기
 
 공개 Abstract의 성능 수치만 외우지 않고 다음 질문을 남긴다.
 
@@ -81,7 +81,7 @@ DJFS는 **per-directory transaction**을 통해 journaling의 contention과 comm
 
 세 논문을 통합해서 하나의 benchmark 성능 순위를 만드는 것은 **실험 목적과 장치 조건이 다르므로 적절하지 않다**.
 
-## 7. 실제로 확인해 보고 싶은 지점
+## 실제로 확인해 보고 싶은 지점
 
 ### D2FS
 
@@ -95,7 +95,7 @@ A→B가 논리적으로 순서 의존 관계인 두 쓰기를 생각해 보자.
 
 같은 디렉터리와 서로 다른 디렉터리의 파일 변경을 비교해 lock contention이 언제 감소하는지 가정해 보자. Cross-directory operation이 어떻게 처리되는지 확인하자.
 
-## 8. 자료 범위
+## 자료 범위
 
 위 메커니즘의 명칭과 문제 정의는 공개된 Abstract를 기준으로 했다. 실제 자료구조와 성능 결과를 비교하려면 각 논문의 구현·실험 부분을 별도로 확인해야 한다.
 

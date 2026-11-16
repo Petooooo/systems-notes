@@ -13,7 +13,7 @@ type: "concept"
 series: "Linux Systems Foundations"
 tags: ["posix", "c", "cpp", "ipc", "threads", "sockets", "epoll"]
 ---
-## 1. API 호출 뒤에 남는 상태
+## API 호출 뒤에 남는 상태
 
 C/C++ 코드를 작성하다 보면 함수 호출만 생각하기 쉽다. 그러나 프로세스, 파일 디스크립터, 시스템 콜이 등장하는 순간 **운영체제가 관리하는 자원의 수명과 실행 순서**를 함께 고민해야 한다. 일반적인 함수 호출과 달리 POSIX API에서는 **누가 자원을 소유하고, 언제 블로킹되고, 실패 이후 무엇을 정리해야 하는가**가 중요하다.
 
@@ -21,7 +21,7 @@ C/C++ 코드를 작성하다 보면 함수 호출만 생각하기 쉽다. 그러
 
 ![프로세스 주소 공간과 IPC 및 동기화 경계](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/kdt/kdt-posix-boundaries.svg)
 
-## 2. User Space와 Kernel Space
+## User Space와 Kernel Space
 
 C 라이브러리 함수와 system call은 구분해야 한다. 예를 들어 `printf()`는 stdio 버퍼링을 거칠 수 있고, `write()`는 파일 디스크립터를 이용해 커널에 I/O를 요청한다.
 
@@ -64,7 +64,7 @@ int main(void) {
 
 “그냥 재시도”는 권한이나 경로 오류를 해결하지 않는다.
 
-## 3. Process: 프로그램과 실행 단위
+## Process: 프로그램과 실행 단위
 
 실행 파일은 디스크 위의 데이터이고, 프로세스는 커널이 실행 상태·주소 공간·자원을 관리하는 단위다. 일반적인 프로세스에는 text, data, heap, stack, mmap 영역 등이 있다. 실제 배치는 ASLR과 아키텍처·런타임에 따라 달라진다.
 
@@ -103,7 +103,7 @@ int main(void) {
 
 프로세스 종료 이후 부모가 자식 상태를 수거하지 않으면 zombie가 남을 수 있다. 또 `fork()`로 물려받은 파일 디스크립터와 `FD_CLOEXEC` 설정은 새 실행 이미지에서도 중요한 문제가 된다.
 
-## 4. File Descriptor: 파일, 파이프, 소켓의 공통 핸들
+## File Descriptor: 파일, 파이프, 소켓의 공통 핸들
 
 파일 디스크립터는 프로세스가 커널 자원에 접근하는 데 사용하는 **정수 핸들**이다. 작은 숫자 자체가 파일 객체는 아니다.
 
@@ -124,7 +124,7 @@ Pipe의 읽는 측은 **모든 쓰기 측 FD가 닫혀야** EOF를 관찰할 수
 
 이 문제는 코드를 잘못 작성한 스레드가 아니라 **FD 소유권과 수명**의 문제다.
 
-## 5. Thread와 Synchronization
+## Thread와 Synchronization
 
 스레드는 같은 프로세스의 가상주소 공간을 공유한다. 그렇기 때문에 heap 등의 데이터 접근이 편하지만 race condition도 쉽게 발생한다. 스레드별 stack과 register context는 별도다.
 
@@ -155,7 +155,7 @@ void increment(void) {
 
 동기화를 많이 하는 것보다 **공유 상태와 보호 범위를 정확히 정하는 것**이 먼저다.
 
-## 6. Signal, Timer와 비동기 사건
+## Signal, Timer와 비동기 사건
 
 Signal은 프로세스/스레드에 비동기 이벤트를 통지한다. signal handler는 일반 함수와 동일한 실행 제약을 갖지 않는다. 예를 들어 handler 내부에서 임의의 libc 함수를 호출해도 안전한 것은 아니므로 **async-signal-safe** 함수와 동기화·재진입 문제를 고려해야 한다.
 
@@ -163,7 +163,7 @@ Signal은 프로세스/스레드에 비동기 이벤트를 통지한다. signal 
 
 Timer가 만료되는 시점과 사용자 콜백이 실제로 실행되는 시점도 같지 않을 수 있다. 커널 타이머와 scheduler의 역할이 다르기 때문이다.
 
-## 7. IPC: Pipe, FIFO, Message Queue, Shared Memory
+## IPC: Pipe, FIFO, Message Queue, Shared Memory
 
 | 방식 | 데이터 모델 | 특징 | 주의점 |
 |---|---|---|---|
@@ -193,7 +193,7 @@ if (ptr != MAP_FAILED) {
 
 `mmap()`은 가상주소 영역을 매핑한다. **즉시 모든 물리 페이지를 할당한다는 의미는 아니다.** 위의 `MAP_PRIVATE | MAP_ANONYMOUS`도 그 자체로 독립 프로세스 사이의 공유 메모리를 설정하는 예제는 아니다.
 
-## 8. Socket: TCP와 UDP가 보장하는 것
+## Socket: TCP와 UDP가 보장하는 것
 
 ### 8.1 TCP는 메시지가 아니라 바이트 스트림
 
@@ -221,7 +221,7 @@ UDP는 데이터그램의 경계를 유지하지만, 손실·순서·재전송·
 | `EINTR` | “항상 치명적 오류” | 중단된 시스템 콜과 재시도 조건 |
 | 클라이언트가 느림 | “언젠가는 처리됨” | 큐·버퍼 용량과 back-pressure |
 
-## 9. `select`, `poll`, `epoll`: 여러 FD를 처리하는 방법
+## `select`, `poll`, `epoll`: 여러 FD를 처리하는 방법
 
 동시 연결이 많아지면 **연결마다 스레드 한 개**라는 설계의 비용이 커질 수 있다. I/O multiplexing은 여러 FD의 상태를 감시해 준비된 대상을 처리한다.
 
@@ -234,7 +234,7 @@ UDP는 데이터그램의 경계를 유지하지만, 손실·순서·재전송·
 
 `epoll`이 있다고 모든 작업이 자동으로 nonblocking이 되는 것은 아니다. 특히 **Edge-triggered(ET)** 모델에서는 일반적으로 FD를 nonblocking으로 두고 읽을 수 있는 데이터를 `EAGAIN`까지 모두 처리하는 설계가 필요하다.
 
-## 10. 코드로 다시 확인할 것
+## 코드로 다시 확인할 것
 
 | 실험 | 검증할 내용 | 예상 실패 조건 |
 |---|---|---|
@@ -247,7 +247,7 @@ UDP는 데이터그램의 경계를 유지하지만, 손실·순서·재전송·
 
 실행한 결과와 오류 로그가 쌓이면 `labs/system-programming/`에 코드와 함께 남긴다.
 
-## 11. 헷갈리기 쉬운 개념
+## 헷갈리기 쉬운 개념
 
 | 혼동하기 쉬운 두 가지 | 구분 |
 |---|---|
@@ -260,7 +260,7 @@ UDP는 데이터그램의 경계를 유지하지만, 손실·순서·재전송·
 | Nonblocking / asynchronous completion | 바로 대기하지 않는 I/O / 완료 통지 모델 |
 | Retry / idempotency | 작업을 반복함 / 반복해도 의도된 효과 유지 |
 
-## 12. 남는 질문
+## 남는 질문
 
 시스템 프로그래밍에서는 API의 정상 경로만큼 **실패했을 때 무엇을 남기고 무엇을 회수해야 하는지**가 중요하다. 특히 FD, 메모리, 소켓처럼 다른 실행 흐름과 참조를 공유할 수 있는 자원은 닫는 시점까지 따져야 한다.
 

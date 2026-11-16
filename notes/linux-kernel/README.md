@@ -10,7 +10,7 @@ Technical study of scheduling, memory, VFS, file systems, kernel tracing, debugg
 - [Kernel crash, vmcore and postmortem analysis](kdt-crash-dump.mdx)
 - [eBPF, BCC, perf and monitoring](kdt-ebpf-observability.mdx)
 
-## Focused OS Lab preparation topics
+## Kernel internals and experiments
 
 - [Virtual memory, mmap and page faults](virtual-memory-mmap-fault.mdx)
 - [CFS to EEVDF scheduling](scheduler-cfs-eevdf.mdx)

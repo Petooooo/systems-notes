@@ -13,7 +13,7 @@ type: "concept"
 series: "Linux Systems Foundations"
 tags: ["linux", "kdt", "posix", "scheduler", "memory", "filesystems"]
 ---
-## 1. Linux 내부 구조를 다시 정리하는 이유
+## Linux 내부 구조를 다시 정리하는 이유
 
 Linux를 개발·운영 환경으로 쓰는 것에서 더 나아가, **프로그램이 실행되는 동안 커널이 어떤 자원을 관리하고 어디에서 지연이 생기는지** 이해하고 싶었다. 같은 오류라도 프로세스·메모리·파일시스템·네트워크 중 어떤 계층이 책임지는지 구분하는 것이 가장 중요했다.
 
@@ -23,7 +23,7 @@ C/C++와 시스템 프로그래밍에서 출발해 프로세스·스레드, 스�
 
 ![Linux 시스템 동작을 프로세스에서 관측 도구까지 정리한 계층도](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/kdt/kdt-learning-map.svg)
 
-## 2. 프로그램을 한 번 실행할 때 실제로 거치는 계층
+## 프로그램을 한 번 실행할 때 실제로 거치는 계층
 
 사용자에게 보이는 프로그램의 동작과 내부에서 처리하는 계층을 나누면 다음과 같다.
 
@@ -40,7 +40,7 @@ C/C++와 시스템 프로그래밍에서 출발해 프로세스·스레드, 스�
 
 여기서 배운 가장 중요한 사고방식은 **상위 계층의 증상과 하위 계층의 가설을 혼동하지 않는 것**이다. 예를 들어 프로그램이 느리다는 사실만으로 스케줄러가 문제인지, lock을 기다리는지, 저장장치 I/O가 막혔는지 단정할 수 없다.
 
-## 3. Linux 사용·설정: shell과 권한부터 시작
+## Linux 사용·설정: shell과 권한부터 시작
 
 ### 3.1 Shell, pipe, redirection
 
@@ -80,7 +80,7 @@ grep 'ERROR' app.log | sort | uniq -c > error-count.txt
 
 도구가 여러 개인 이유는 각 도구가 같은 실패를 확인하는 것이 아니라 **서로 다른 실패 지점을 분리하기 때문**이다.
 
-## 4. System Programming: 함수 호출 이후의 세계
+## System Programming: 함수 호출 이후의 세계
 
 C/C++에서 작성한 코드는 라이브러리와 시스템 콜을 통해 커널의 기능을 사용한다. 커널로 넘어가는 경계에서 프로세스·메모리·파일·소켓의 의미가 달라진다.
 
@@ -109,7 +109,7 @@ C/C++에서 작성한 코드는 라이브러리와 시스템 콜을 통해 커�
 
 자세한 내용은 [POSIX 시스템 프로그래밍 학습 노트](https://petooooo.github.io/notes/study-kdt-posix/)에서 이어진다.
 
-## 5. Scheduler: 실행 중과 실행 가능은 다르다
+## Scheduler: 실행 중과 실행 가능은 다르다
 
 CPU에서 동작하는 태스크를 추적하면서 **Running, Runnable, Sleeping**을 구분하는 습관이 중요했다.
 
@@ -132,7 +132,7 @@ Raspberry Pi에 Linux를 구성하고 ftrace와 KernelShark로 커널 함수 및
 
 타임라인에 이벤트가 표시됐다는 사실만으로 **스케줄링 지연의 원인까지 입증된 것은 아니다**. 당시 정확한 context-switch 시간 수치는 따로 보관하지 않았으므로, 필요하면 새로운 실험으로 측정해야 한다.
 
-## 6. Virtual Memory: 가상주소와 물리 페이지를 분리하기
+## Virtual Memory: 가상주소와 물리 페이지를 분리하기
 
 가상 메모리를 공부할 때 다음 개념을 연결하는 것이 핵심이었다.
 
@@ -148,7 +148,7 @@ Raspberry Pi에 Linux를 구성하고 ftrace와 KernelShark로 커널 함수 및
 
 이 구분은 나중에 **컨테이너 메모리 제한, 호스트 OOM, page cache 사용량**을 해석할 때 다시 나타났다.
 
-## 7. VFS·파일시스템·스토리지
+## VFS·파일시스템·스토리지
 
 ### 7.1 `open()`에서 블록 장치까지
 
@@ -173,7 +173,7 @@ Raspberry Pi에 Linux를 구성하고 ftrace와 KernelShark로 커널 함수 및
 
 이 영역이 현재 가장 우선적으로 심화하려는 주제다. [스케줄러·가상 메모리·VFS 노트](https://petooooo.github.io/notes/study-kdt-kernel-vfs-memory/)에서 자세히 정리한다.
 
-## 8. Embedded Linux: 하드웨어의 이벤트를 커널에서 다루기
+## Embedded Linux: 하드웨어의 이벤트를 커널에서 다루기
 
 전자공학에서 익힌 회로·인터페이스 지식이 가장 직접적으로 연결된 영역이다. ARM, Raspberry Pi, device tree, kernel module, GPIO, SPI, UART, PWM, IRQ, threaded IRQ, workqueue가 하나의 장치 제어 경로를 구성한다.
 
@@ -186,7 +186,7 @@ Raspberry Pi에 Linux를 구성하고 ftrace와 KernelShark로 커널 함수 및
 
 [Embedded Linux와 Device Driver 노트](https://petooooo.github.io/notes/study-kdt-embedded-linux/)에서 상세히 정리한다.
 
-## 9. 성능 관측과 장애 분석: 무엇을 측정하는 도구인가
+## 성능 관측과 장애 분석: 무엇을 측정하는 도구인가
 
 | 관측 도구 | 주로 알 수 있는 정보 | 해석할 때의 함정 |
 |---|---|---|
@@ -202,7 +202,7 @@ Raspberry Pi에 Linux를 구성하고 ftrace와 KernelShark로 커널 함수 및
 - [Crash Dump 분석 노트](https://petooooo.github.io/notes/study-kdt-crash-dump/)
 - [eBPF·BCC·Observability 노트](https://petooooo.github.io/notes/study-kdt-ebpf-observability/)
 
-## 10. Linux 인프라 운영 경험과 연결
+## Linux 인프라 운영 경험과 연결
 
 | 시스템 개념 | 운영하면서 떠올린 질문 | 더 공부할 부분 |
 |---|---|---|
@@ -215,7 +215,7 @@ Raspberry Pi에 Linux를 구성하고 ftrace와 KernelShark로 커널 함수 및
 
 처음부터 연구 주제를 하나로 정했던 것은 아니다. 여러 시스템 계층을 이해하고 Linux 인프라를 운영하면서 **커널·파일시스템·스토리지의 내부 동작을 더 깊이 이해하고 싶다**는 방향으로 관심이 좁혀졌다.
 
-## 11. 다음에 이 글을 다시 읽을 때
+## 다음에 이 글을 다시 읽을 때
 
 다음 순서로 복습하면 서로 다른 노트가 연결된다.
 

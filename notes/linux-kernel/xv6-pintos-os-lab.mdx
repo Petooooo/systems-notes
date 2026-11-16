@@ -12,7 +12,7 @@ type: "concept"
 tags: ["xv6", "pintos", "os-implementation", "qemu", "scheduler"]
 ---
 
-## 1. Linux 소스와 교육용 OS 실습의 차이
+## Linux 소스와 교육용 OS 실습의 차이
 
 Linux 커널은 실용적인 코드와 하드웨어 지원이 방대해 처음부터 모든 분기를 이해하기 어렵다. xv6·Pintos는 상대적으로 작게 설계된 교육용 OS라 **system call, process, virtual memory, scheduler의 본질적인 연결**을 공부하기 좋다.
 
@@ -20,7 +20,7 @@ Linux 커널은 실용적인 코드와 하드웨어 지원이 방대해 처음�
 
 ![시스템 개념에서 구현·테스트로 이동하는 학습 경로](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/roadmap/kernel-source.svg)
 
-## 2. xv6와 Pintos의 차이
+## xv6와 Pintos의 차이
 
 | 구분 | xv6 | Pintos |
 | --- | --- | --- |
@@ -32,7 +32,7 @@ Linux 커널은 실용적인 코드와 하드웨어 지원이 방대해 처음�
 
 정확한 코드 위치와 API는 사용하는 과제 버전에 따라 달라질 수 있다. **원본 저장소/배포 버전을 고정한 뒤** 읽어야 한다.
 
-## 3. 첫 번째 목표: 빌드·부팅 확인
+## 첫 번째 목표: 빌드·부팅 확인
 
 1. 특정 저장소와 commit/tag를 고정한다.
 2. 문서에 제시된 toolchain을 준비한다.
@@ -43,7 +43,7 @@ Linux 커널은 실용적인 코드와 하드웨어 지원이 방대해 처음�
 
 빌드가 통과했다는 사실과 **scheduler 기능을 직접 구현했다는 사실은 다르다**. 구현 이력을 과장하지 않는다.
 
-## 4. System Call 추가하기
+## System Call 추가하기
 
 새 시스템 콜을 구현한다고 생각하면 다음 계층이 모두 필요할 수 있다.
 
@@ -59,7 +59,7 @@ Linux 커널은 실용적인 코드와 하드웨어 지원이 방대해 처음�
 
 하나의 새 함수가 컴파일됐다고 해서 전체 syscall API가 안전하게 동작한다고 볼 수 없다.
 
-## 5. Scheduler 실습
+## Scheduler 실습
 
 실행 순서를 바꾸려면 **어떤 task가 실행 가능한지**를 관리해야 한다. 우선 preemption과 context switch의 기본 경로를 살핀다.
 
@@ -73,7 +73,7 @@ Linux 커널은 실용적인 코드와 하드웨어 지원이 방대해 처음�
 
 구현 결과는 test를 실행한 뒤에만 완료로 표기한다.
 
-## 6. Virtual Memory 실습
+## Virtual Memory 실습
 
 VM 과제에서는 PTE, page fault, user/kernel address space, demand allocation 등을 생각할 수 있다.
 
@@ -85,17 +85,17 @@ VM 과제에서는 PTE, page fault, user/kernel address space, demand allocation
 | Page fault loop | Fault handler가 상태를 수정하지 못함 |
 | Stack overflow | User stack 범위 관리 |
 
-## 7. 테스트와 디버깅
+## 테스트와 디버깅
 
 GDB와 QEMU의 디버깅 기능을 이용해 register/stack/task 정보를 확인할 수 있다. 로그 출력을 많이 추가하면 concurrency timing이 달라질 수 있으므로 **추적 자체의 영향**을 고려한다.
 
 실행 로그에는 failing test, 예상한 동작, 실제 동작, 수정한 코드, 재실행 결과를 함께 보관한다.
 
-## 8. Linux로 넘어갈 때의 주의점
+## Linux로 넘어갈 때의 주의점
 
 교육용 OS에서 구현한 단순한 scheduler나 page allocator를 Linux의 실제 생산 코드와 일대일 대응시키면 위험하다. 목적은 **추상화·불변식·상태 변화**를 이해하는 것이며, Linux에서는 여러 아키텍처와 성능 최적화가 추가된다.
 
-## 9. 완료 기준
+## 확인할 기준
 
 | 단계 | 증거 |
 | --- | --- |

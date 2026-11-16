@@ -73,10 +73,18 @@ Drafts remain visible in GitHub and are excluded only from the website importer.
 
 Store runnable code and results under `labs/`; conceptual notes can link to lab repositories or reproducible outputs.
 
-## Study roadmap maintenance
+## Maintaining the topic index
 
 The [kernel-to-storage reading guide](../notes/study-roadmap.mdx) connects topics; the [topic index](../notes/study-curriculum.mdx) links individual articles. Treat technical notes, executed labs, and verified measurements as different kinds of evidence.
 
 ## Public safety and disclosure
 
 This is a **public repository**. Do not include secrets, credentials, internal endpoints, private military deployment topology, production recovery commands, classified details, unpublished laboratory research, personal data or copied copyrighted course content.
+
+## Editorial rhythm and figures
+
+- Prefer descriptive section headings over identical numbered eight-step outlines. Keep a numbered sequence only when the order is part of an experiment or procedure.
+- Start with the technical question or concrete observation; avoid course-preparation and admissions framing in public technical writing.
+- Choose figures to expose the actual mechanism: scheduler timelines, file-object graphs, block maps, queue topology, persistence boundaries, or algorithm states. Do not use generic four-card pipelines for unrelated subjects.
+- State explicitly whether a chart is schematic or based on measurements. Never present invented timings, performance improvements, code execution, or paper reproduction as observed results.
+- Reused figures must fit the specific article; create a focused diagram when the existing illustration teaches a different mechanism.

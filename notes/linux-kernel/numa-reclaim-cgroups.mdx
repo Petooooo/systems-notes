@@ -12,13 +12,13 @@ type: "concept"
 tags: ["numa", "memory-reclaim", "cgroups", "oom", "psi"]
 ---
 
-## 1. RAM이 남아도 메모리 접근이 느릴 수 있다
+## RAM이 남아도 메모리 접근이 느릴 수 있다
 
 메모리 문제를 “부족하다/충분하다”로만 나누면 중요한 성능 이슈를 놓친다. NUMA 시스템에서는 **데이터가 어느 메모리 노드에 있는지**가 지연과 bandwidth에 영향을 줄 수 있다. 메모리 압박에서는 Page reclaim과 swap이 CPU·I/O 비용을 만든다.
 
 ![NUMA와 memory pressure 경로](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/roadmap/memory-numa.svg)
 
-## 2. NUMA의 기본 구조
+## NUMA의 기본 구조
 
 NUMA(Non-Uniform Memory Access)는 CPU와 메모리의 물리적 위치 관계에 따라 접근 비용이 다른 구조다. 같은 총 RAM을 사용해도 local/remote memory 접근 비율이 달라지면 성능이 달라질 수 있다.
 
@@ -33,13 +33,13 @@ NUMA(Non-Uniform Memory Access)는 CPU와 메모리의 물리적 위치 관계�
 
 실제 성능 차이는 CPU 아키텍처·워크로드·페이지 배치에 따라 달라진다.
 
-## 3. Memory reclaim
+## Memory reclaim
 
 커널은 필요에 따라 cache와 anonymous memory를 회수하려 한다. Clean file-backed cache는 버릴 수 있는 경우가 있지만 dirty data는 writeback이 필요할 수 있다. Anonymous memory는 swap과도 관련된다.
 
 Reclaim 과정은 CPU, lock 및 디스크 I/O 부담을 일으킬 수 있다. 따라서 **OOM이 발생하지 않아도 메모리 압력 때문에 latency가 악화**될 수 있다.
 
-## 4. PSI: 메모리 압력을 시간으로 보기
+## PSI: 메모리 압력을 시간으로 보기
 
 Pressure Stall Information(PSI)은 특정 자원 때문에 task의 진행이 지연된 시간을 관찰하는 방법이다.
 
@@ -51,7 +51,7 @@ cat /proc/pressure/io
 
 지원 여부는 커널과 설정에 따라 다르다. 사용률 그래프와 PSI는 같은 값이 아니다. **메모리가 많이 할당됐다는 것**과 **그 때문에 작업이 stall됐다는 것**을 구분할 수 있다.
 
-## 5. Cgroup memory limit
+## Cgroup memory limit
 
 컨테이너 기반 환경에서는 cgroup이 메모리 예산을 제한할 수 있다. Workload가 cgroup limit을 초과해 종료되는 상황과 호스트 전체의 메모리 부족은 다르다.
 
@@ -65,13 +65,13 @@ cat /proc/pressure/io
 
 특정 프로세스가 OOM victim으로 선택됐다고 해서 **근본 원인이 반드시 그 프로세스**인 것은 아니다.
 
-## 6. Memory와 Storage가 연결되는 지점
+## Memory와 Storage가 연결되는 지점
 
 Dirty page를 회수하려면 먼저 writeback이 필요할 수 있다. 따라서 느린 SSD 또는 저장공간 압박이 memory reclaim을 어렵게 만들 수 있다.
 
 이러한 상황에서는 Memory pressure와 I/O pressure가 동시에 높아질 수 있다. 증상 하나만으로 “메모리 문제” 또는 “디스크 문제”라고 확정하면 놓치는 계층이 생긴다.
 
-## 7. 실험 계획
+## 실험 계획
 
 | 실험 | 변경 변수 | 관찰 |
 | --- | --- | --- |
@@ -83,7 +83,7 @@ Dirty page를 회수하려면 먼저 writeback이 필요할 수 있다. 따라�
 
 테스트용 환경과 데이터로만 시행하고, 과도한 메모리 할당으로 공유 호스트를 불안정하게 만들지 않는다.
 
-## 8. 복습 질문
+## 확인할 질문
 
 - RAM 사용량이 낮은데 remote memory가 병목일 수 있는가?
 - Page cache 사용량과 OOM 위험을 왜 동일시하면 안 되는가?

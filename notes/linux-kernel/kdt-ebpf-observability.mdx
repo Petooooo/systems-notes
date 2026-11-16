@@ -13,7 +13,7 @@ type: "concept"
 series: "Linux Systems Foundations"
 tags: ["ebpf", "bcc", "ftrace", "perf", "prometheus", "observability"]
 ---
-## 1. Monitoring과 Tracing을 함께 공부한 이유
+## Monitoring과 tracing의 역할
 
 Linux 시스템의 문제가 겉으로는 “CPU 사용률 증가”나 “응답 지연”처럼 나타나더라도, CPU 그래프만 봐서는 **어느 태스크에서 어떤 커널 경로가 지연됐는지** 알기 어렵다.
 
@@ -23,7 +23,7 @@ CPU 사용률만으로 문제 원인을 설명하기 어려워서 `/proc`, `ps`,
 
 ![Metrics에서 kernel event까지 이어지는 관측 흐름](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/kdt/kdt-observability-evidence.svg)
 
-## 2. 관측 계층을 구분하기
+## 관측 계층을 구분하기
 
 | 관측 수단 | 대표 정보 | 해상도·한계 |
 |---|---|---|
@@ -38,7 +38,7 @@ CPU 사용률만으로 문제 원인을 설명하기 어려워서 `/proc`, `ps`,
 
 지표가 초당 평균값이라면 짧은 tail latency spike는 평균값에 가려질 수 있다. 로그는 문제가 언제 생겼는지 알려줄 수 있지만, 왜 그 시점에 실행 흐름이 지연됐는지는 다른 자료가 필요하다.
 
-## 3. `/proc`를 먼저 이해하기
+## `/proc`를 먼저 이해하기
 
 Linux는 `/proc`를 통해 프로세스·시스템 상태를 보여준다. 예를 들어 다음 자료를 관찰할 수 있다.
 
@@ -69,7 +69,7 @@ cat /proc/pressure/memory
 
 `/proc/pressure/memory`는 커널·환경에 따라 지원 여부를 확인해야 한다. 출력 숫자를 읽을 때는 단순 점유율이 아니라 **자원 부족으로 실제 작업이 얼마나 지연됐는지**를 이해하는 데 초점을 맞춘다.
 
-## 4. `perf`와 Sampling
+## `perf`와 Sampling
 
 CPU 프로파일링에서 `perf`는 함수/명령어 비용을 살피는 데 유용하다.
 
@@ -91,7 +91,7 @@ perf stat -- sleep 1
 | Context switch | 전환 수 증가가 나쁜 것인지 workload에 따라 다름 |
 | Call graph | unwinding/심볼 품질에 따라 불완전할 수 있음 |
 
-## 5. ftrace의 위치
+## ftrace의 위치
 
 ftrace는 커널 이벤트를 수집하는 기능으로, KernelShark는 특정 trace 데이터의 타임라인을 탐색하는 도구다. 스케줄러 이벤트는 실행 흐름을 이해하는 데 도움이 된다.
 
@@ -105,7 +105,7 @@ ftrace는 커널 이벤트를 수집하는 기능으로, KernelShark는 특정 t
 
 하지만 이벤트를 많이 켠다고 무조건 원인을 더 잘 알 수 있는 것은 아니다. **대상 사건이 발생하는 전후의 최소 정보를 수집하는 편이 오버헤드와 해석 부담을 줄일 수 있다**.
 
-## 6. eBPF는 무엇인가
+## eBPF는 무엇인가
 
 eBPF는 커널 등에서 안전한 프로그램 실행을 지원하는 메커니즘이다. 프로그램은 verifier 검사와 권한·attach 조건을 거쳐 허용된 hook에 연결될 수 있다.
 
@@ -120,7 +120,7 @@ eBPF는 커널 등에서 안전한 프로그램 실행을 지원하는 메커니
 5. eBPF map 또는 ring buffer 등의 방식으로 결과를 사용자 공간에 전달할 수 있다.
 6. 사용자 공간에서 이벤트를 집계·시각화한다.
 
-## 7. kprobe와 kretprobe
+## kprobe와 kretprobe
 
 BCC Python 응용 프로그램, **kprobe/kretprobe** 기반 이벤트 관찰은 실제 데이터를 어떻게 모으고 묶을지 고민하기 좋은 사례다.
 
@@ -143,7 +143,7 @@ BCC Python 응용 프로그램, **kprobe/kretprobe** 기반 이벤트 관찰은 
 
 한 번의 이벤트 수집보다 **일관된 대상/키와 실패 조건**의 설계가 더 중요하다.
 
-## 8. 히스토그램과 평균값의 함정
+## 히스토그램과 평균값의 함정
 
 Latency 분석에서 산술 평균값 하나만 보면 tail latency 문제를 놓칠 수 있다.
 
@@ -159,7 +159,7 @@ Latency 분석에서 산술 평균값 하나만 보면 tail latency 문제를 �
 
 메모리 회수나 저장장치 GC처럼 드물게 큰 지연이 발생할 수 있는 영역에서는 p99와 분포 자체가 중요하다. 단, 적은 샘플 수에서 p99를 과도하게 해석하면 안 된다.
 
-## 9. Prometheus, Node Exporter, Grafana
+## Prometheus, Node Exporter, Grafana
 
 ### 9.1 Pull 모델
 
@@ -185,7 +185,7 @@ Grafana 대시보드는 정보를 많이 보여주는 것보다 “어떤 현상
 4. Queue depth와 worker 처리 속도
 5. 상세 로그·trace로 연결되는 관측 링크
 
-## 10. 로그와 trace, metric을 상호 보완하기
+## 로그와 trace, metric을 상호 보완하기
 
 장애 발생 시 생각해 볼 순서는 다음과 같다.
 
@@ -197,7 +197,7 @@ Grafana 대시보드는 정보를 많이 보여주는 것보다 “어떤 현상
 
 이 과정을 갖추면 모든 실패를 “리소스 부족”이나 “네트워크 문제”로 뭉뚱그리지 않을 수 있다.
 
-## 11. 다음 학습 실습: 실제 결과를 누적할 계획
+## 다음 학습 실습: 실제 결과를 누적할 계획
 
 이후 직접 재현할 실험을 다음과 같이 계획한다.
 
@@ -212,7 +212,7 @@ Grafana 대시보드는 정보를 많이 보여주는 것보다 “어떤 현상
 
 과거 실행 로그를 보유하지 않은 항목은 **새 실험을 했다고 가정하지 않는다**. 앞으로 실제 관측값을 남겨 이 노트를 고도화한다.
 
-## 12. 자주 헷갈리는 것
+## 자주 헷갈리는 것
 
 | 개념 | 정확한 구분 |
 |---|---|
@@ -224,7 +224,7 @@ Grafana 대시보드는 정보를 많이 보여주는 것보다 “어떤 현상
 | High CPU / slow request | CPU 바쁨 / 사용자 지연 원인이 반드시 CPU는 아님 |
 | Trace correlation / causation | 같은 시각 / 실제 원인 관계 증명 |
 
-## 13. 핵심 정리
+## 핵심 정리
 
 관측의 목표는 **더 많은 그래프를 만드는 것**이 아니라 **가설을 반박하거나 지지할 증거를 얻는 것**이다. 메트릭으로 이상 구간을 찾고, 필요한 커널 이벤트만 추적하고, 실험을 반복해 원인을 좁히는 방법을 익히는 것이 중요하다.
 

@@ -12,13 +12,13 @@ type: "concept"
 tags: ["virtual-memory", "mmap", "page-fault", "cow", "tlb"]
 ---
 
-## 1. `malloc()`으로 받은 주소가 RAM을 뜻하는가?
+## `malloc()`으로 받은 주소가 RAM을 뜻하는가?
 
 메모리 할당 API가 돌려주는 주소는 보통 **가상주소**다. 운영체제는 프로세스가 보는 주소 공간과 실제 물리 프레임을 분리하고, 페이지를 처음 사용할 때 매핑을 완료할 수 있다. 따라서 VIRT가 큰 프로세스가 그 크기만큼 물리 RAM을 독점한다고 판단하면 안 된다.
 
 ![Virtual memory와 page fault 처리 흐름](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/roadmap/virtual-memory.svg)
 
-## 2. VMA와 프로세스 주소 공간
+## VMA와 프로세스 주소 공간
 
 | 영역 | 역할 | 주의할 점 |
 | --- | --- | --- |
@@ -31,13 +31,13 @@ tags: ["virtual-memory", "mmap", "page-fault", "cow", "tlb"]
 
 Linux의 VMA는 주소 영역의 속성과 범위를 나타내는 추상화다. 커널 내부에서 VMA를 찾는 자료구조는 버전에 따라 바뀔 수 있으므로 단일 구현을 영구한 사실로 보지 않는다.
 
-## 3. MMU와 TLB
+## MMU와 TLB
 
 CPU가 가상주소를 참조하면 페이지 테이블이 가상주소를 물리주소에 연결한다. TLB는 주소 변환 결과를 캐싱한다. 중요한 구분은 **TLB miss는 page fault와 다르다**는 점이다. TLB에 변환이 없어도 페이지 테이블에 유효한 엔트리가 있으면 page-table walk로 처리할 수 있다.
 
 Page fault는 매핑이 없거나 접근 조건을 처리해야 할 때 발생하는 예외다. 반드시 버그를 뜻하는 것은 아니다.
 
-## 4. `malloc`, `brk`, `mmap`
+## `malloc`, `brk`, `mmap`
 
 `malloc()`은 libc allocator의 API다. 내부적으로 `brk` 또는 `mmap` 계열을 활용할 수 있지만 할당 크기와 구현에 따라 달라진다. `mmap()`은 익명 영역 또는 파일을 주소 공간에 매핑한다.
 
@@ -58,7 +58,7 @@ int main(void) {
 
 이 코드는 **개념 검증용 예제**다. 매핑 직후와 페이지를 실제로 쓴 뒤 RSS 및 fault 횟수를 비교하면 demand paging과 연결해 생각할 수 있다. 커널·페이지 크기·THP 설정에 따라 결과는 달라진다.
 
-## 5. Page fault 종류
+## Page fault 종류
 
 | 종류 | 해석 | 잘못된 직관 |
 | --- | --- | --- |
@@ -69,7 +69,7 @@ int main(void) {
 
 `fork()` 직후 부모와 자식의 페이지 테이블은 물리 페이지를 공유할 수 있다. 한쪽이 수정하려는 순간 분리해야 하는 상태가 나타나는데, 이것이 COW를 이해하는 핵심이다.
 
-## 6. VIRT, RSS, PSS
+## VIRT, RSS, PSS
 
 - **VIRT:** 가상주소 공간에 포함된 매핑 크기와 관련된다.
 - **RSS:** 실제 상주하는 물리 메모리 페이지의 크기이며 공유 페이지를 각 프로세스가 따로 계산할 수 있다.
@@ -78,13 +78,13 @@ int main(void) {
 
 메모리의 합계를 구할 때 프로세스별 RSS를 단순히 더하면 공유 페이지를 여러 번 계산할 수 있다. cgroup memory 사용량과도 직접 대응하지 않는다.
 
-## 7. Memory pressure와 OOM
+## Memory pressure와 OOM
 
 메모리가 부족하면 커널은 reclaim을 시도한다. Clean file cache는 버릴 수 있는 경우가 있지만 dirty page는 writeback이 필요할 수 있다. Anonymous memory는 swap 설정 등과 관련된다.
 
 Container limit에 의한 cgroup OOM과 host 전체 메모리 압박은 별개다. **OOM victim이 근본적인 메모리 증가의 원인이라는 보장도 없다.**
 
-## 8. 관측 실험을 설계한다면
+## 관측 실험을 설계한다면
 
 | 단계 | 관측 정보 | 구분하려는 현상 |
 | --- | --- | --- |
@@ -97,7 +97,7 @@ Container limit에 의한 cgroup OOM과 host 전체 메모리 압박은 별개�
 
 `perf stat`, `/usr/bin/time -v`, `/proc/PID/smaps_rollup` 등이 관측 후보이다. 실제 측정 전에는 “예상 결과”와 “관측 결과”를 구분한다.
 
-## 9. 복습 질문
+## 확인할 질문
 
 1. TLB miss와 page fault는 왜 서로 다른가?
 2. 유효한 페이지에 처음 접근해도 fault가 발생할 수 있는가?

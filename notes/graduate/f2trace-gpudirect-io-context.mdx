@@ -12,7 +12,7 @@ type: "concept"
 tags: ["f2trace", "gpudirect-storage", "nvme", "io-tracing", "gpu"]
 ---
 
-## 1. NVMe가 빨라도 I/O 경로 전체가 빠르다는 뜻은 아니다
+## NVMe가 빨라도 I/O 경로 전체가 빠르다는 뜻은 아니다
 
 저장장치의 완료 시간과 애플리케이션이 체감하는 지연에는 **파일시스템·block queue·CPU 처리·메모리 복사·GPU 데이터 준비** 등 여러 비용이 있다.
 
@@ -20,7 +20,7 @@ tags: ["f2trace", "gpudirect-storage", "nvme", "io-tracing", "gpu"]
 
 ![Storage에서 GPU 계산까지의 단계적 경로](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/roadmap/gpu-io.svg)
 
-## 2. 일반적인 I/O 경로의 비용
+## 일반적인 I/O 경로의 비용
 
 | 경계 | 관찰할 비용 |
 | --- | --- |
@@ -33,7 +33,7 @@ tags: ["f2trace", "gpudirect-storage", "nvme", "io-tracing", "gpu"]
 
 이 경계가 분명해야 “NVMe latency를 측정한다”면서 다른 비용을 섞는 실수를 줄일 수 있다.
 
-## 3. NVMe 큐에서는 무엇을 기록할까?
+## NVMe 큐에서는 무엇을 기록할까?
 
 제목이 강조하는 것은 **NVMe queue 수준의 추적, 낮은 오버헤드, 메모리 효율**이다. 그렇다면 일반적인 block trace보다 무엇이 더 구체적으로 필요할까?
 
@@ -46,7 +46,7 @@ tags: ["f2trace", "gpudirect-storage", "nvme", "io-tracing", "gpu"]
 
 기술의 세부 구현은 발표 자료/원문을 확인해야 한다. 제목만으로 내부 자료구조를 추정해 설명하지 않는다.
 
-## 4. GPU I/O의 문제: 계산 이전의 데이터 이동
+## GPU I/O의 문제: 계산 이전의 데이터 이동
 
 GPU kernel 실행이 빠르더라도 모델 입력을 준비하고 GPU memory에 옮기는 과정이 느리면 전체 처리량이 낮을 수 있다.
 
@@ -61,7 +61,7 @@ GPU kernel 실행이 빠르더라도 모델 입력을 준비하고 GPU memory에
 
 GPUDirect Storage는 특정 환경에서 host-mediated copy와 data movement 경로를 바꾸는 기술이지만 **모든 시스템에서 무조건 더 빠르다는 뜻은 아니다**. 장치·드라이버·파일시스템·버퍼 정렬 등의 조건이 중요하다.
 
-## 5. 관찰할 성능 지표
+## 관찰할 성능 지표
 
 | 지표 | 질문 |
 | --- | --- |
@@ -73,7 +73,7 @@ GPUDirect Storage는 특정 환경에서 host-mediated copy와 data movement 경
 | GPU idle time | 데이터를 기다리느라 계산이 멈추는가 |
 | Trace overhead | 계측 때문에 결과가 변하는가 |
 
-## 6. 코드와 자료를 따라간다면
+## 코드와 자료를 따라간다면
 
 1. NVMe SQ/CQ와 blk-mq 구조 복습.
 2. Block request issue/complete 관계 이해.
@@ -83,11 +83,11 @@ GPUDirect Storage는 특정 환경에서 host-mediated copy와 data movement 경
 6. 논문 원문의 implementation/evaluation 읽기.
 7. 통제된 pipeline benchmark를 설계한다.
 
-## 7. 직접 확인한다면
+## 직접 확인한다면
 
 GDS 지원 장치가 없다면 **일반 buffered I/O와 GPU 계산을 이어 붙인 synthetic pipeline**의 비용을 먼저 분해할 수 있다. 이것은 실제 GPUDirect Storage 성능 측정과 다르므로 결과 제목에 분명히 표시해야 한다.
 
-## 8. 질문
+## 질문
 
 - NVMe queue-level trace가 syscall trace보다 유용한 경우는?
 - I/O completion과 GPU kernel의 작업 완료를 어떻게 연결하는가?

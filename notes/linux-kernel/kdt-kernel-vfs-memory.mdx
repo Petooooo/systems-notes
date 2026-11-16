@@ -13,7 +13,7 @@ type: "concept"
 series: "Linux Systems Foundations"
 tags: ["linux-kernel", "scheduler", "memory", "vfs", "page-cache", "storage"]
 ---
-## 1. 스케줄러, 메모리, 파일시스템을 함께 공부해야 하는 이유
+## 스케줄러, 메모리, 파일시스템의 연결점
 
 응용 프로그램은 CPU·메모리·파일을 별개의 API로 사용한다. 그런데 시스템이 실제로 느려지거나 멈출 때는 세 영역이 서로 연결되어 있다. 파일을 읽다가 페이지 폴트가 발생하면 스토리지 I/O를 기다릴 수 있고, 대기했던 태스크가 깨어난 뒤에도 CPU가 배정되기까지 시간이 걸릴 수 있다.
 
@@ -21,7 +21,7 @@ Linux의 프로세스 상태와 CFS·runqueue·context switch를 보다가, 지�
 
 ![스케줄러 이벤트와 메모리 및 파일시스템 제어 경로를 연결한 개념도](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/kdt/kdt-kernel-observation.svg)
 
-## 2. Process 상태와 CPU 스케줄링
+## Process 상태와 CPU 스케줄링
 
 ### 2.1 프로세스가 Running이 아닌 이유
 
@@ -50,7 +50,7 @@ Context switch는 한 실행 흐름의 상태를 저장하고 다른 실행 흐�
 
 따라서 “context switch는 항상 몇 마이크로초”라는 고정값으로 이해하기 어렵다. CPU, 커널, 스케줄링 정책, 워크로드에 따라 달라진다.
 
-## 3. CFS, `vruntime`, runqueue
+## CFS, `vruntime`, runqueue
 
 전통적인 Linux **CFS(Completely Fair Scheduler)**의 사고방식과 runqueue부터 이해해 보았다. CFS는 태스크별로 소비한 실행 시간을 가중치와 함께 평가하는 `vruntime` 개념을 중심으로 공정성을 추구한다.
 
@@ -70,7 +70,7 @@ Context switch는 한 실행 흐름의 상태를 저장하고 다른 실행 흐�
 
 응답 시간이 길어도 blocked 시간이 대부분이라면 스케줄러 공정성보다 I/O 경로를 먼저 분석해야 할 수 있다.
 
-## 4. ftrace: 이벤트를 관측하는 것과 원인을 찾는 것은 다르다
+## ftrace: 이벤트를 관측하는 것과 원인을 찾는 것은 다르다
 
 ftrace와 KernelShark로 실행 경로를 살펴볼 때 가장 흥미로웠던 부분은 **커널 이벤트를 시간축으로 확인할 수 있다는 점**이었다.
 
@@ -104,7 +104,7 @@ Raspberry Pi 기반 환경에서 함수 호출과 스케줄링 이벤트를 관�
 
 커널 버전과 tracer 설정을 기록하지 않으면 나중에 결과를 비교하기 어렵다.
 
-## 5. Interrupt, Softirq, Workqueue
+## Interrupt, Softirq, Workqueue
 
 하드웨어 인터럽트는 커널이 비동기 사건에 반응하는 경로다. 하지만 hard IRQ handler는 일반 프로세스 문맥과 다르고 **sleep 가능한 API를 임의로 호출할 수 없다**.
 
@@ -118,7 +118,7 @@ Raspberry Pi 기반 환경에서 함수 호출과 스케줄링 이벤트를 관�
 
 이 구분이 중요한 이유는 커널 코드를 작성할 때 **동일한 함수라도 호출 문맥에 따라 안전성이 달라질 수 있기 때문**이다.
 
-## 6. Virtual Memory의 기본 구조
+## Virtual Memory의 기본 구조
 
 ### 6.1 가상주소와 물리주소
 
@@ -145,7 +145,7 @@ Raspberry Pi 기반 환경에서 함수 호출과 스케줄링 이벤트를 관�
 
 실제 fault 종류와 횟수는 워크로드, OS, 메모리 상태에 따라 달라진다.
 
-## 7. Reclaim과 OOM
+## Reclaim과 OOM
 
 메모리가 부족하다고 판단되는 과정은 단순히 “프로그램 heap 크기의 합이 RAM보다 크다”로 설명할 수 없다. page cache, anonymous memory, slab, kernel memory, cgroup 제한, 회수 가능한 페이지 등을 구분해야 한다.
 
@@ -164,7 +164,7 @@ Raspberry Pi 기반 환경에서 함수 호출과 스케줄링 이벤트를 관�
 
 운영 시스템에서 host-level OOM을 봤을 때 “가장 큰 컨테이너가 원인”이라고 단정하면 위험하다. 호스트 프로세스와 cgroup 메모리 사용량을 함께 봐야 한다.
 
-## 8. VFS: 경로에서 파일 객체로
+## VFS: 경로에서 파일 객체로
 
 ### 8.1 VFS의 필요성
 
@@ -188,7 +188,7 @@ Linux는 여러 파일시스템이 공통 시스템 콜 인터페이스로 보�
 
 이 구분은 “같은 파일을 두 번 읽는데 왜 순서가 달라지는가?” 같은 질문과 연결된다.
 
-## 9. Page Cache, Dirty Page, Writeback
+## Page Cache, Dirty Page, Writeback
 
 ### 9.1 읽기 경로
 
@@ -207,7 +207,7 @@ Buffered write는 데이터가 page cache에서 dirty 상태가 된 뒤 나중�
 | `fdatasync()` | 파일 데이터와 필요한 메타데이터 동기화 |
 | Storage flush | 장치 내부 volatile cache 및 ordering 의미 확인 |
 
-## 10. 파일시스템의 Consistency와 Journaling
+## 파일시스템의 Consistency와 Journaling
 
 파일시스템 metadata가 여러 블록에 나뉘어 있다면 중간에 전원 장애가 났을 때 **부분 갱신 상태**가 남을 수 있다. Journaling은 이러한 복구 문제를 완화하기 위한 메커니즘이다.
 
@@ -223,7 +223,7 @@ Buffered write는 데이터가 page cache에서 dirty 상태가 된 뒤 나중�
 
 이 질문들은 석사 진학 후 직접 재현 실험으로 연결할 만하다.
 
-## 11. Flash와 F2FS, 그리고 NVMe
+## Flash와 F2FS, 그리고 NVMe
 
 기존 HDD를 전제로 설계한 저장 방식과 Flash SSD의 특성은 다르다.
 
@@ -238,7 +238,7 @@ Buffered write는 데이터가 page cache에서 dirty 상태가 된 뒤 나중�
 
 특히 궁금했던 부분은 **VFS에서 시작한 I/O 요청이 NVMe 장치까지 내려가는 동안 비용이 어디에서 발생하는가**였다. 컨테이너에서 PVC를 쓰는 상위 경험을 이 경로의 구현과 연결하고 싶다.
 
-## 12. 세 분야를 한 번에 연결한 예제
+## 세 분야를 한 번에 연결한 예제
 
 `read()`가 느리다는 상황을 생각해 보자.
 
@@ -252,7 +252,7 @@ Buffered write는 데이터가 page cache에서 dirty 상태가 된 뒤 나중�
 
 측정값을 분리하면 `read()` 지연 안에서도 **스토리지 대기 시간과 runnable 대기 시간**을 구분할 실마리가 생긴다.
 
-## 13. 다음 재현 실험 계획
+## 다음 재현 실험 계획
 
 | 실험 | 도구 후보 | 관측 대상 |
 |---|---|---|
@@ -265,7 +265,7 @@ Buffered write는 데이터가 page cache에서 dirty 상태가 된 뒤 나중�
 
 표의 도구는 선택 후보이며, 정확한 실험 환경과 실제 결과는 이후에 기록할 예정이다.
 
-## 14. 면담 대비 복습 질문
+## 면담 대비 복습 질문
 
 - `malloc`, `brk`, `mmap`은 각각 어떤 책임을 가지는가?
 - CFS의 `vruntime`은 무엇이며 커널 버전에 따라 어떤 설명을 조정해야 하는가?
