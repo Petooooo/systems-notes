@@ -2,6 +2,7 @@
 
 This directory contains **Korean-language study articles**, organized with English folder names and metadata.
 
+- [Complete study curriculum](study-curriculum.mdx) — full index of operating systems, kernel, storage, research, and algorithm articles
 - [Study roadmap](study-roadmap.mdx) — KAIST OS Lab preparation, kernel and storage foundations, algorithms, research papers, and reproducible experiments
 - [Linux kernel](linux-kernel/) — scheduling, memory, VFS, tracing, drivers, crash analysis
 - [System programming](system-programming/) — POSIX, IPC, concurrency, and sockets
@@ -10,7 +11,7 @@ This directory contains **Korean-language study articles**, organized with Engli
 - [Undergraduate courses](undergraduate/) — CS and electronic engineering reviews
 - [Graduate study](graduate/) — research-oriented reading and class notes
 
-### Linux systems course notes
+### Linux systems foundations
 
 - [Course overview](linux-kernel/kdt-overview.mdx)
 - [POSIX programming](system-programming/kdt-posix.mdx)

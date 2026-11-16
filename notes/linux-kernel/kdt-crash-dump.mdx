@@ -1,7 +1,8 @@
 ---
 title: "Linux 커널 덤프 분석: vmcore·crash·문제 원인 추적"
-description: "KDT에서 학습한 kernel crash와 dump 분석을 기반으로 Oops/Panic, symbols, vmcore, task/stack, memory와 장애 원인 검증 방법을 정리한다."
+description: "커널 Oops·Panic 이후 vmcore와 심볼, task/stack·memory state로 원인 가설을 검증하는 분석 흐름을 정리한다."
 date: "2026-11-15"
+updated: "2026-11-16"
 draft: false
 reviewed: true
 sensitivity: public
@@ -9,18 +10,18 @@ slug: "study-kdt-crash-dump"
 area: "Linux Kernel"
 category: "Study"
 type: "concept"
-series: "KDT Linux Systems"
+series: "Linux Systems Foundations"
 tags: ["kernel", "crash", "vmcore", "debugging", "kdump", "troubleshooting"]
 ---
 ## 1. 동작 중인 시스템과 멈춘 시스템을 분석하는 방법은 다르다
 
-KDT에서 ftrace를 통해 **실행 중인 커널 이벤트**를 관찰한 뒤, 커널 덤프 분석을 공부하며 다른 질문을 만나게 됐다.
+ftrace로 **실행 중인 커널 이벤트**를 살펴본 다음, 커널 덤프를 읽는 방법을 공부하면서 다른 질문이 생겼다.
 
 > 시스템이 이미 멈췄을 때, 그 순간에 남은 메모리와 레지스터 상태로 어디까지 원인을 설명할 수 있을까?
 
 Crash dump는 보통 특정 시점의 **메모리·프로세스·스택·커널 상태**를 제공한다. 반면 trace는 선택된 이벤트가 발생한 **시간 순서**를 제공한다. dump와 trace는 서로 대체재가 아니다.
 
-KDT 과정에서는 커널 코드·자료구조를 살펴보고, Trace32와 crash 계열 도구, vmcore의 해석 및 troubleshooting 방법을 학습했다. 이 노트는 그때 배운 분석 관점을 다시 정리하고, 향후 격리된 환경에서 재현할 순서를 기록한다.
+커널 자료구조와 Trace32·crash 계열 도구, vmcore의 해석과 troubleshooting 방법을 연결해 정리했다. 이 노트는 그때 배운 분석 관점을 다시 정리하고, 향후 격리된 환경에서 재현할 순서를 기록한다.
 
 ![Crash dump에서 커널 상태·스택·로그를 분석하는 흐름](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/kdt/kdt-crash-analysis.svg)
 
@@ -203,8 +204,8 @@ Crash 실험은 머신과 파일시스템에 직접 영향을 줄 수 있으므�
 
 ## 참고자료
 
-- KDT 2기 커널 덤프 분석·Troubleshooting 수업
+- Linux crash dump / debugging 학습 자료
 - [Linux kdump documentation](https://docs.kernel.org/admin-guide/kdump/kdump.html)
 - [Linux kernel debugging documentation](https://docs.kernel.org/dev-tools/)
 - [Crash utility](https://crash-utility.github.io/)
-- [KDT 전체 학습 노트](https://petooooo.github.io/notes/study-kdt-overview/)
+- [Linux 시스템 전체 학습 흐름](https://petooooo.github.io/notes/study-kdt-overview/)

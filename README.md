@@ -20,8 +20,9 @@ This convention applies to **new and edited notes**. Existing older notes may ha
 
 | Track | Contents |
 | --- | --- |
+| [Complete Study Curriculum](notes/study-curriculum.mdx) | All 29 topic articles, learning sequence, experiment boundaries and links grouped by track |
 | [Study Roadmap](notes/study-roadmap.mdx) | Detailed preparation for KAIST OS Lab, with weekly milestones, experiments, paper reading, and interview preparation |
-| [KDT Linux Course](notes/linux-kernel/kdt-overview.mdx) | A six-article learning series on Linux/POSIX, scheduling, VM, VFS, drivers, crash analysis, and observability |
+| [Linux Systems Foundations](notes/linux-kernel/kdt-overview.mdx) | A six-article learning series on Linux/POSIX, scheduling, VM, VFS, drivers, crash analysis, and observability |
 | [System Programming](notes/system-programming/) | POSIX processes, threads, synchronization, IPC, sockets and event-driven I/O |
 | [Linux Kernel](notes/linux-kernel/) | Scheduler, memory management, tracing, debugging, interrupt and driver internals |
 | [Storage & File Systems](notes/storage/) | VFS, ext4/F2FS, page cache, writeback, block I/O, NVMe, flash and ZNS |
@@ -29,7 +30,7 @@ This convention applies to **new and edited notes**. Existing older notes may ha
 | [Undergraduate Courses](notes/undergraduate/) | Computer science, computer architecture, networking, digital hardware and related coursework |
 | [Graduate Study](notes/graduate/) | Graduate coursework, paper reviews, reproductions, and public research notes |
 
-### KDT Linux systems series
+### Linux systems foundations
 
 - [Course overview](notes/linux-kernel/kdt-overview.mdx)
 - [POSIX programming, IPC and sockets](notes/system-programming/kdt-posix.mdx)
@@ -48,6 +49,7 @@ systems-notes/
 ├── docs/
 │   └── WRITING.md
 ├── notes/
+│   ├── study-curriculum.mdx
 │   ├── study-roadmap.mdx
 │   ├── linux-kernel/
 │   ├── storage/
@@ -57,6 +59,7 @@ systems-notes/
 │   ├── graduate/
 │   └── _templates/
 ├── assets/
+│   ├── roadmap/
 │   └── kdt/
 ├── labs/
 │   ├── algorithms/

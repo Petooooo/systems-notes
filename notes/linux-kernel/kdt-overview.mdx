@@ -1,7 +1,8 @@
 ---
-title: "KDT 리눅스 시스템·커널 전문가 과정: 전체 학습 정리"
-description: "직접 수강한 KDT 2기의 Linux 기초, POSIX, 커널 스케줄링·가상 메모리·VFS, 드라이버와 tracing까지 연결하는 기술 노트."
+title: "Linux 시스템 내부 구조: 프로세스부터 스토리지까지"
+description: "POSIX·스케줄러·가상 메모리·VFS·드라이버·추적 도구를 하나의 실행 흐름으로 연결하고, 직접 관찰하며 이해한 내용을 정리한다."
 date: "2026-11-15"
+updated: "2026-11-16"
 draft: false
 reviewed: true
 sensitivity: public
@@ -9,18 +10,18 @@ slug: "study-kdt-overview"
 area: "Linux Kernel"
 category: "Study"
 type: "concept"
-series: "KDT Linux Systems"
+series: "Linux Systems Foundations"
 tags: ["linux", "kdt", "posix", "scheduler", "memory", "filesystems"]
 ---
-## 1. 이 글을 다시 쓰는 이유
+## 1. Linux 내부 구조를 다시 정리하는 이유
 
-2023년 10월부터 2024년 3월까지 **Linux System & Kernel Expert Course(K-Digital Training 2기)**를 수강했다. Linux를 단순한 개발·운영 환경으로 사용하는 데서 한 단계 더 내려가, 프로그램이 실제로 실행되고 자원이 관리되는 과정을 배우고 싶었다.
+Linux를 개발·운영 환경으로 쓰는 것에서 더 나아가, **프로그램이 실행되는 동안 커널이 어떤 자원을 관리하고 어디에서 지연이 생기는지** 이해하고 싶었다. 같은 오류라도 프로세스·메모리·파일시스템·네트워크 중 어떤 계층이 책임지는지 구분하는 것이 가장 중요했다.
 
-수강 과정에서 C/C++와 시스템 프로그래밍으로 출발해 프로세스·스레드, 스케줄링, 가상 메모리, 파일시스템, 디바이스 드라이버, 커널 디버깅과 컨테이너·모니터링까지 연결해서 공부했다. 특히 **Raspberry Pi에서 Linux를 구성하고 ftrace 및 KernelShark로 커널 함수 호출·스케줄링 이벤트를 확인하는 실습**은 운영체제 개념을 실제 타임라인으로 보는 경험이었다.
+C/C++와 시스템 프로그래밍에서 출발해 프로세스·스레드, 스케줄링, 가상 메모리, 파일시스템, 디바이스 드라이버와 커널 디버깅까지 연결해 정리했다. 특히 **Raspberry Pi에 Linux를 구성하고 ftrace와 KernelShark로 커널 함수·스케줄링 이벤트를 살펴봤던 경험**은 교재에서 보던 개념을 실제 시간축으로 이해하는 계기였다.
 
-이 글은 수료 이력을 홍보하기 위한 글이라기보다, 나중에 다시 OS를 공부할 때 **어떤 개념이 서로 연결되는지 떠올리기 위한 길잡이**다. 개별 주제는 별도 노트에 더 자세히 정리하고, 이 글에서는 전체 계층과 학습 순서를 연결한다.
+이 글은 나중에 OS를 다시 공부할 때 **각 개념이 어떤 경로로 연결되는지 떠올리기 위한 기술 지도**다. 개별 주제는 별도 노트에 더 자세히 정리하고, 이 글에서는 전체 계층과 학습 순서를 연결한다.
 
-![KDT 학습 경로를 시스템 계층으로 정리한 다크모드 개념도](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/kdt/kdt-learning-map.svg)
+![Linux 시스템 동작을 프로세스에서 관측 도구까지 정리한 계층도](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/kdt/kdt-learning-map.svg)
 
 ## 2. 프로그램을 한 번 실행할 때 실제로 거치는 계층
 
@@ -67,7 +68,7 @@ grep 'ERROR' app.log | sort | uniq -c > error-count.txt
 
 ### 3.3 네트워크 진단의 출발점
 
-과정에서 TCP/UDP, ARP, DNS, NAT, routing, SSH, 방화벽, 소켓 등을 공부했다. 연결 문제가 생겼을 때 아래 항목은 각각 별도로 확인해야 한다.
+네트워크 경로를 이해하려면 TCP/UDP, ARP, DNS, NAT, routing, SSH, 방화벽, 소켓을 함께 봐야 한다. 연결 문제가 생겼을 때 아래 항목은 각각 별도로 확인해야 한다.
 
 | 확인 계층 | 질문 | 관련 명령 예시 |
 |---|---|---|
@@ -94,7 +95,7 @@ C/C++에서 작성한 코드는 라이브러리와 시스템 콜을 통해 커�
 
 ### 4.2 IPC와 socket
 
-교육에서는 `pipe`, FIFO, POSIX/System V 메시지 큐, 세마포어, 공유 메모리, `mmap`, TCP/UDP 소켓과 I/O multiplexing을 다뤘다.
+프로세스 사이의 통신을 이해할 때는 `pipe`, FIFO, POSIX/System V 메시지 큐, 세마포어, 공유 메모리, `mmap`, TCP/UDP 소켓과 I/O multiplexing을 구분한다.
 
 기억할 구분은 다음과 같다.
 
@@ -118,7 +119,7 @@ CPU에서 동작하는 태스크를 추적하면서 **Running, Runnable, Sleepin
 
 프로세스가 오랫동안 반응하지 않았다고 해서 반드시 CPU 스케줄링이 나쁜 것은 아니다. 런큐에서 대기했는지, wait queue에서 잠들었는지 구분해야 한다.
 
-과정에서 CFS, 실시간 스케줄링 정책, 선점, 멀티코어 부하 분산, context switch를 공부했다. 다만 Linux 스케줄러 내부 구현은 **커널 버전별로 변한다**. 수업 당시의 CFS `vruntime`·red-black tree 개념을 현재 버전의 실제 구현이라고 무조건 단정해서는 안 된다.
+CFS, 실시간 스케줄링 정책, 선점, 멀티코어 부하 분산, context switch를 구분한다. Linux 스케줄러는 **커널 버전에 따라 구현이 변한다**. 고전적인 CFS의 `vruntime`·red-black tree 모델을 현재 Linux의 모든 실행 경로에 그대로 적용해서는 안 된다.
 
 ### 5.1 ftrace와 KernelShark
 
@@ -174,7 +175,7 @@ Raspberry Pi에 Linux를 구성하고 ftrace와 KernelShark로 커널 함수 및
 
 ## 8. Embedded Linux: 하드웨어의 이벤트를 커널에서 다루기
 
-전자공학 전공에서 배운 회로·인터페이스 지식이 가장 직접적으로 연결된 영역이었다. 수업에서는 ARM, Raspberry Pi, device tree, kernel module, GPIO, SPI, UART, PWM, IRQ, threaded IRQ, workqueue 등을 다뤘다.
+전자공학에서 익힌 회로·인터페이스 지식이 가장 직접적으로 연결된 영역이다. ARM, Raspberry Pi, device tree, kernel module, GPIO, SPI, UART, PWM, IRQ, threaded IRQ, workqueue가 하나의 장치 제어 경로를 구성한다.
 
 드라이버에서 특히 중요한 질문은 **이 코드가 어떤 execution context에서 실행 중인가**다.
 
@@ -201,9 +202,9 @@ Raspberry Pi에 Linux를 구성하고 ftrace와 KernelShark로 커널 함수 및
 - [Crash Dump 분석 노트](https://petooooo.github.io/notes/study-kdt-crash-dump/)
 - [eBPF·BCC·Observability 노트](https://petooooo.github.io/notes/study-kdt-ebpf-observability/)
 
-## 10. KDT 이후의 경험과 연결
+## 10. Linux 인프라 운영 경험과 연결
 
-| KDT에서 배운 것 | 나중에 떠올린 질문 | 더 공부할 부분 |
+| 시스템 개념 | 운영하면서 떠올린 질문 | 더 공부할 부분 |
 |---|---|---|
 | Scheduler | CPU는 남는데 응답이 느린 이유는? | blocked/runnable time, latency |
 | Virtual memory | Pod 사용량과 호스트 OOM 상황이 달라 보이는 이유는? | cgroup, reclaim, OOM |
@@ -212,7 +213,7 @@ Raspberry Pi에 Linux를 구성하고 ftrace와 KernelShark로 커널 함수 및
 | Tracing | 메트릭에 보이지 않는 병목은 무엇으로 증명할까? | ftrace, perf, eBPF |
 | Device driver | 하드웨어 자원이 OS에 노출되는 과정은? | IRQ, DMA, device model |
 
-내가 KDT를 수강할 때부터 앞으로의 연구 주제를 하나로 정한 것은 아니다. 여러 시스템 계층을 공부하고 실제 Linux 인프라를 운영하면서 **커널·파일시스템·스토리지의 내부 동작을 더 깊이 이해하고 싶다**는 방향으로 관심이 좁혀졌다.
+처음부터 연구 주제를 하나로 정했던 것은 아니다. 여러 시스템 계층을 이해하고 Linux 인프라를 운영하면서 **커널·파일시스템·스토리지의 내부 동작을 더 깊이 이해하고 싶다**는 방향으로 관심이 좁혀졌다.
 
 ## 11. 다음에 이 글을 다시 읽을 때
 
@@ -228,7 +229,7 @@ Raspberry Pi에 Linux를 구성하고 ftrace와 KernelShark로 커널 함수 및
 
 ## 참고자료
 
-- KDT 2기 리눅스 시스템 및 커널 전문가 과정의 학습 내용
+- Linux System & Kernel Expert Course (2023–2024)
 - [Linux kernel documentation](https://docs.kernel.org/)
 - [Linux man-pages](https://man7.org/linux/man-pages/)
 - [Operating Systems: Three Easy Pieces](https://pages.cs.wisc.edu/~remzi/OSTEP/)

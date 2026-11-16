@@ -1,7 +1,8 @@
 ---
 title: "임베디드 Linux: ARM·Device Tree·Driver·IRQ"
-description: "KDT에서 배운 Raspberry Pi와 ARM 부팅, Device Tree, character/platform driver, GPIO/SPI, interrupt와 deferred work의 구조를 정리한다."
+description: "Raspberry Pi·ARM 부팅에서 Device Tree·driver binding·GPIO/SPI·IRQ·workqueue까지 연결해 Linux 장치 모델을 정리한다."
 date: "2026-11-15"
+updated: "2026-11-16"
 draft: false
 reviewed: true
 sensitivity: public
@@ -9,14 +10,14 @@ slug: "study-kdt-embedded-linux"
 area: "Linux Kernel"
 category: "Study"
 type: "concept"
-series: "KDT Linux Systems"
+series: "Linux Systems Foundations"
 tags: ["embedded-linux", "arm", "device-tree", "drivers", "interrupt", "raspberry-pi"]
 ---
 ## 1. Embedded Linux를 왜 배웠나
 
 전자공학을 복수전공하면서 디지털회로·컴퓨터구조·임베디드 시스템을 공부했다. 하지만 장치를 제어하는 코드와 **Linux 커널이 장치를 추상화하고 사용자 프로그램에 노출하는 과정**은 다른 문제였다.
 
-KDT에서는 Raspberry Pi를 이용한 Linux 환경, ARM 아키텍처, bootloader, root filesystem, device tree, platform/character driver, GPIO·SPI·PWM·UART, interrupt, workqueue, kernel module 등을 다뤘다. 이 글에서는 하드웨어를 단순히 “핀에 값을 쓰는 대상”으로 보지 않고, **장치의 발견부터 드라이버 등록·I/O·이벤트 처리·해제까지** 하나의 수명주기로 정리한다.
+Raspberry Pi Linux 환경을 구성해 보면서 ARM, bootloader, root filesystem, device tree, platform/character driver, GPIO·SPI·PWM·UART, interrupt, workqueue, kernel module이 서로 어떻게 연결되는지 생각했다. 이 글에서는 하드웨어를 단순히 “핀에 값을 쓰는 대상”으로 보지 않고, **장치의 발견부터 드라이버 등록·I/O·이벤트 처리·해제까지** 하나의 수명주기로 정리한다.
 
 ![Boot와 driver binding, interrupt, deferred work를 연결한 개념도](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/kdt/kdt-driver-lifecycle.svg)
 
@@ -218,7 +219,7 @@ NVMe 같은 고성능 스토리지 장치 연구에서도 **queue, DMA, interrup
 
 ## 12. 앞으로 재현하고 싶은 학습 실습
 
-아래는 KDT에서 공부한 메커니즘을 **새 환경에서 검증할 계획**이다. 과거 개인 과제 결과로 제시하는 표는 아니다.
+아래는 이해한 메커니즘을 **새 환경에서 다시 검증할 계획**이다. 과거 개인 과제 결과로 제시하는 표는 아니다.
 
 1. QEMU/별도 테스트 환경에서 kernel module 빌드·적재 흐름 확인.
 2. Character device 예제로 `open/read/write/release` 경로 관찰.
@@ -237,8 +238,8 @@ Driver는 하드웨어 register를 직접 쓰는 함수 모음만을 의미하�
 
 ## 참고자료
 
-- KDT 2기 Embedded Linux, ARM 및 디바이스 드라이버 수업
+- Embedded Linux, ARM 및 Linux driver 관련 학습 자료
 - [Linux driver API](https://docs.kernel.org/driver-api/)
 - [Linux device tree usage](https://docs.kernel.org/devicetree/usage-model.html)
 - [Linux Kernel Labs](https://linux-kernel-labs.github.io/refs/heads/master/)
-- [KDT 전체 학습 노트](https://petooooo.github.io/notes/study-kdt-overview/)
+- [Linux 시스템 전체 학습 흐름](https://petooooo.github.io/notes/study-kdt-overview/)

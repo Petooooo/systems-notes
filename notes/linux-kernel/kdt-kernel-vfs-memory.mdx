@@ -1,7 +1,8 @@
 ---
 title: "Linux 커널 심화: 스케줄링·가상 메모리·VFS·스토리지"
-description: "KDT에서 배운 CFS, ftrace/KernelShark, page fault, VFS, page cache, journaling과 Flash I/O를 관측·성능·복구 관점으로 다시 정리한다."
+description: "Scheduler·page fault·VFS·page cache·journaling·Flash I/O를 하나의 커널 실행 경로로 연결하고 추적과 복구 관점에서 정리한다."
 date: "2026-11-15"
+updated: "2026-11-16"
 draft: false
 reviewed: true
 sensitivity: public
@@ -9,14 +10,14 @@ slug: "study-kdt-kernel-vfs-memory"
 area: "Linux Kernel"
 category: "Study"
 type: "concept"
-series: "KDT Linux Systems"
+series: "Linux Systems Foundations"
 tags: ["linux-kernel", "scheduler", "memory", "vfs", "page-cache", "storage"]
 ---
 ## 1. 스케줄러, 메모리, 파일시스템을 함께 공부해야 하는 이유
 
 응용 프로그램은 CPU·메모리·파일을 별개의 API로 사용한다. 그런데 시스템이 실제로 느려지거나 멈출 때는 세 영역이 서로 연결되어 있다. 파일을 읽다가 페이지 폴트가 발생하면 스토리지 I/O를 기다릴 수 있고, 대기했던 태스크가 깨어난 뒤에도 CPU가 배정되기까지 시간이 걸릴 수 있다.
 
-KDT에서는 Linux 프로세스 상태, CFS 스케줄러, runqueue, context switch, 가상 메모리, page fault, VFS·파일시스템의 제어 흐름을 공부했다. 또 Raspberry Pi에 Linux를 설치하고 **ftrace와 KernelShark로 함수 호출과 스케줄링 이벤트를 관찰**했다. 여기서는 각 계층의 정의에서 시작해 “응답 시간이 길다”라는 한 가지 증상을 어떻게 해석할 수 있는지까지 연결한다.
+Linux의 프로세스 상태와 CFS·runqueue·context switch를 보다가, 지연을 이해하려면 page fault와 VFS·파일시스템 제어 흐름도 함께 봐야 한다는 점이 흥미로웠다. Raspberry Pi에 Linux를 설치하고 **ftrace와 KernelShark로 함수 호출과 스케줄링 이벤트를 관찰**했다. 여기서는 각 계층의 정의에서 시작해 “응답 시간이 길다”라는 한 가지 증상을 어떻게 해석할 수 있는지까지 연결한다.
 
 ![스케줄러 이벤트와 메모리 및 파일시스템 제어 경로를 연결한 개념도](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/kdt/kdt-kernel-observation.svg)
 
@@ -51,7 +52,7 @@ Context switch는 한 실행 흐름의 상태를 저장하고 다른 실행 흐�
 
 ## 3. CFS, `vruntime`, runqueue
 
-KDT에서 전통적인 Linux **CFS(Completely Fair Scheduler)**의 사고방식과 runqueue를 공부했다. CFS는 태스크별로 소비한 실행 시간을 가중치와 함께 평가하는 `vruntime` 개념을 중심으로 공정성을 추구한다.
+전통적인 Linux **CFS(Completely Fair Scheduler)**의 사고방식과 runqueue부터 이해해 보았다. CFS는 태스크별로 소비한 실행 시간을 가중치와 함께 평가하는 `vruntime` 개념을 중심으로 공정성을 추구한다.
 
 ### 3.1 공정성을 어떻게 정의할까
 
@@ -71,9 +72,9 @@ KDT에서 전통적인 Linux **CFS(Completely Fair Scheduler)**의 사고방식�
 
 ## 4. ftrace: 이벤트를 관측하는 것과 원인을 찾는 것은 다르다
 
-교육 과정에서 ftrace와 KernelShark를 접하며 가장 흥미로웠던 부분은 **커널 이벤트를 시간축으로 확인할 수 있다는 점**이었다.
+ftrace와 KernelShark로 실행 경로를 살펴볼 때 가장 흥미로웠던 부분은 **커널 이벤트를 시간축으로 확인할 수 있다는 점**이었다.
 
-Raspberry Pi 기반 환경에서 함수 호출과 스케줄링 이벤트를 관찰하고 KernelShark로 타임라인을 확인했다. 강의에서 처음 보면 이벤트 이름만으로는 무슨 일이 일어났는지 이해하기 어렵다. 그래서 다음 순서로 해석하는 것이 좋다.
+Raspberry Pi 기반 환경에서 함수 호출과 스케줄링 이벤트를 관찰하고 KernelShark로 타임라인을 확인했다. 이벤트 이름만으로는 실제 동작을 이해하기 어렵다. 그래서 다음 순서로 해석하는 것이 좋다.
 
 | 이벤트 종류 | 알고 싶은 것 |
 |---|---|
@@ -279,10 +280,10 @@ OSLab 준비에서 특히 중요하게 본 부분은 **VFS에서 시작한 I/O �
 
 ## 참고자료
 
-- KDT 2기 프로세스·가상 메모리·파일시스템 수업
+- Linux scheduler, virtual memory, VFS 학습 자료
 - [Linux kernel documentation](https://docs.kernel.org/)
 - [OSTEP](https://pages.cs.wisc.edu/~remzi/OSTEP/)
 - [Linux VFS documentation](https://docs.kernel.org/filesystems/vfs.html)
 - [ext4 documentation](https://docs.kernel.org/filesystems/ext4/)
 - [Linux block layer](https://docs.kernel.org/block/)
-- [KDT 전체 학습 노트](https://petooooo.github.io/notes/study-kdt-overview/)
+- [Linux 시스템 전체 학습 흐름](https://petooooo.github.io/notes/study-kdt-overview/)

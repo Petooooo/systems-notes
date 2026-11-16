@@ -1,0 +1,115 @@
+---
+title: "Two Pointers·Binary Search·Prefix Sum 패턴"
+description: "정렬 전제, 단조성, 탐색 불변식, off-by-one, 누적합을 대표 반례와 Python 예제로 정리한다."
+date: "2026-11-16"
+draft: false
+reviewed: true
+sensitivity: public
+slug: "study-two-pointers-binary-search"
+area: "Algorithms"
+category: "Study"
+type: "concept"
+series: "OSLab Preparation"
+tags: ["binary-search", "two-pointers", "prefix-sum", "sorting"]
+---
+
+## 1. 같은 배열 문제라도 전제가 다르다
+
+Two pointers, binary search, prefix sum은 모두 배열을 다루지만 요구하는 조건이 다르다. **어떤 성질이 성립해서 전체 탐색을 줄일 수 있는가**를 먼저 확인해야 한다.
+
+| 기법 | 필요한 핵심 조건 | 대표 문제 |
+| --- | --- | --- |
+| Two pointers | 포인터 이동으로 후보를 버릴 근거 | 정렬된 pair, 연속 구간 |
+| Binary search | 단조성 또는 정렬 | 위치 탐색, 최적값 결정 |
+| Prefix sum | 구간 합의 차이 표현 | 구간 합 질의 |
+| Sliding window | 창의 상태를 증분 갱신 가능 | 빈도 제약 구간 |
+| Sorting | 순서가 비교 비용을 줄임 | 중복 제거, 간격 최적화 |
+
+## 2. Two pointers의 불변식
+
+정렬된 배열에서 합이 target인 두 수를 찾는다면 왼쪽/오른쪽 포인터를 둘 수 있다.
+
+```python
+def pair_sum(a, target):
+    a = sorted(a)
+    l, r = 0, len(a) - 1
+    while l < r:
+        current = a[l] + a[r]
+        if current == target:
+            return (a[l], a[r])
+        if current < target:
+            l += 1
+        else:
+            r -= 1
+    return None
+```
+
+이 방법이 정당한 이유는 배열이 정렬되어 있어서 **현재 합이 작을 때 오른쪽 값을 줄이면 더 작아질 뿐**이기 때문이다. 정렬 전제 없이 같은 이동을 사용하면 답을 놓칠 수 있다.
+
+## 3. Sliding window와 음수
+
+양수만 있는 배열에서는 구간 합을 늘리고 줄이는 방향이 단조롭게 동작할 수 있다. 그러나 음수가 섞이면 오른쪽으로 확장했다고 합이 반드시 커지지 않는다. 따라서 **양수 전제를 확인하지 않은 sliding-window 풀이**는 틀릴 수 있다.
+
+## 4. Binary search의 불변식
+
+정렬된 리스트에서 `target` 이상인 첫 위치를 찾는 lower-bound를 예로 보자.
+
+```python
+def lower_bound(a, target):
+    lo, hi = 0, len(a)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if a[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid
+    return lo
+```
+
+여기서 탐색 구간은 **반열린 구간 `[lo, hi)`**이다. 반복문 진입 시 조건을 유지하는 방식으로 생각하면 off-by-one 오류를 줄일 수 있다.
+
+## 5. Decision binary search
+
+배열을 직접 탐색하는 대신 특정 자원량 X로 **작업이 가능한가?**를 판정해 최솟값/최댓값을 찾는 경우가 있다.
+
+- 비용 X가 커질수록 가능 여부가 항상 같은 방향으로 변하는가?
+- `possible(X)`를 어떻게 계산하는가?
+- Lower/upper bound를 어떻게 설정하는가?
+- 답이 아예 존재하지 않으면 무엇을 반환하는가?
+
+**단조성을 증명할 수 없다면** binary search를 적용할 근거가 없다.
+
+## 6. Prefix sum
+
+누적합을 `P[i+1] = P[i] + A[i]`로 정의하면 반열린 구간 `[l, r)`의 합은 `P[r] - P[l]`이다. 초기값 `P[0]=0`을 넣으면 앞쪽 경계 처리가 쉬워진다.
+
+```python
+def prefix_sums(a):
+    p = [0]
+    for value in a:
+        p.append(p[-1] + value)
+    return p
+```
+
+Query가 Q개 있다면 매번 O(N) 합을 구하는 대신 전처리 O(N), 각 질의 O(1) 구조를 고려할 수 있다.
+
+## 7. 실패 사례와 반례
+
+| 실수 | 반례 |
+| --- | --- |
+| 빈 배열을 고려하지 않음 | `[]` |
+| 중복된 값에서 경계 혼동 | `[2,2,2]` |
+| 음수 배열에 양수용 window 사용 | `[3,-5,4]` |
+| `mid` 조건이 잘못됨 | Target가 모든 값보다 큼 |
+| 구간의 포함/미포함 혼동 | `[l,r)`와 `[l,r]` |
+
+## 8. 학습 순서
+
+정렬된 합 문제 → 중복 lower bound → 구간 합 → 조건형 binary search → sliding window의 단조성 증명 순서로 실습한다.
+
+각 문제를 풀 때는 코드보다 **포인터를 움직여도 정답 후보를 놓치지 않는 이유**를 먼저 설명해 보자.
+
+## 참고자료
+
+- [CP-Algorithms: Binary Search](https://cp-algorithms.com/num_methods/binary_search.html)
+- [Python bisect](https://docs.python.org/3/library/bisect.html)

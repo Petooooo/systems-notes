@@ -1,7 +1,8 @@
 ---
 title: "eBPF·BCC와 Linux 관측: ftrace·perf·Prometheus"
-description: "KDT의 tracing·monitoring 학습을 `/proc`, perf, ftrace, eBPF/BCC, kprobe/kretprobe, Prometheus/Grafana의 목적·한계·실험 설계로 확장한다."
+description: "`/proc`, perf, ftrace, eBPF/BCC, kprobe·tracepoint와 Prometheus/Grafana를 관측 목적·오버헤드·증거 수집 방법으로 비교한다."
 date: "2026-11-15"
+updated: "2026-11-16"
 draft: false
 reviewed: true
 sensitivity: public
@@ -9,16 +10,16 @@ slug: "study-kdt-ebpf-observability"
 area: "Linux Kernel"
 category: "Study"
 type: "concept"
-series: "KDT Linux Systems"
+series: "Linux Systems Foundations"
 tags: ["ebpf", "bcc", "ftrace", "perf", "prometheus", "observability"]
 ---
 ## 1. Monitoring과 Tracing을 함께 공부한 이유
 
 Linux 시스템의 문제가 겉으로는 “CPU 사용률 증가”나 “응답 지연”처럼 나타나더라도, CPU 그래프만 봐서는 **어느 태스크에서 어떤 커널 경로가 지연됐는지** 알기 어렵다.
 
-KDT에서 `/proc`, `ps`, `iostat`, `netstat`, `sar`, ftrace, KernelShark, `perf`, eBPF/BCC, Prometheus·Grafana 등의 개념을 공부했다. 이때 관측 도구는 모두 같은 기능을 하는 것이 아니라, **관찰 단위·시간 해상도·오버헤드·설명력**이 다르다는 점을 이해하려 했다.
+CPU 사용률만으로 문제 원인을 설명하기 어려워서 `/proc`, `ps`, `iostat`, `sar`, ftrace, KernelShark, `perf`, eBPF/BCC, Prometheus·Grafana가 각각 어떤 증거를 제공하는지 비교해 보았다. 이때 관측 도구는 모두 같은 기능을 하는 것이 아니라, **관찰 단위·시간 해상도·오버헤드·설명력**이 다르다는 점을 이해하려 했다.
 
-이 글은 **문제를 발견하기 → 작은 가설을 만들기 → 적합한 이벤트를 수집하기 → 지표와 대조하기**의 순서로 정리한다. 아래 명령과 코드는 향후 실습을 위한 학습 예시이며, 과거 KDT에서 실행한 결과라고 주장하지 않는다.
+이 글은 **문제를 발견하기 → 작은 가설을 만들기 → 적합한 이벤트를 수집하기 → 지표와 대조하기**의 순서로 정리한다. 아래 명령과 코드는 복습용 예시이며 실행 측정값을 뜻하지 않는다.
 
 ![Metrics에서 kernel event까지 이어지는 관측 흐름](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/kdt/kdt-observability-evidence.svg)
 
@@ -121,7 +122,7 @@ eBPF는 커널 등에서 안전한 프로그램 실행을 지원하는 메커니
 
 ## 7. kprobe와 kretprobe
 
-KDT 커리큘럼에서는 **BCC Python 응용 프로그램, kprobe/kretprobe를 이용한 이벤트 관찰**을 다뤘다.
+BCC Python 응용 프로그램, **kprobe/kretprobe** 기반 이벤트 관찰은 실제 데이터를 어떻게 모으고 묶을지 고민하기 좋은 사례다.
 
 - **kprobe:** 커널 함수 내부의 지정 지점에서 정보를 관찰.
 - **kretprobe:** 함수 반환 시점 정보를 관찰.
@@ -209,7 +210,7 @@ Grafana 대시보드는 정보를 많이 보여주는 것보다 “어떤 현상
 | Prometheus dashboard | scrape/metric 변화 | scrape interval, exporter |
 | Trace와 metric 비교 | 같은 장애를 다른 관점에서 보기 | 시간 동기화, 샘플 범위 |
 
-과정에서 각 도구를 배운 것은 사실이지만, 공개 가능한 과거 실행 로그가 없는 경우 **새 실험을 했다고 가정하지 않는다**. 앞으로 실제 관측값을 남겨 이 노트를 고도화한다.
+과거 실행 로그를 보유하지 않은 항목은 **새 실험을 했다고 가정하지 않는다**. 앞으로 실제 관측값을 남겨 이 노트를 고도화한다.
 
 ## 12. 자주 헷갈리는 것
 
@@ -229,9 +230,9 @@ Grafana 대시보드는 정보를 많이 보여주는 것보다 “어떤 현상
 
 ## 참고자료
 
-- KDT 2기 통합 프로세스 모니터링·커널 tracing 교육 내용
+- Linux tracing, eBPF, performance monitoring 학습 자료
 - [eBPF documentation](https://docs.kernel.org/bpf/)
 - [BCC project](https://github.com/iovisor/bcc)
 - [Linux perf wiki](https://perf.wiki.kernel.org/)
 - [Prometheus documentation](https://prometheus.io/docs/)
-- [KDT 전체 학습 노트](https://petooooo.github.io/notes/study-kdt-overview/)
+- [Linux 시스템 전체 학습 흐름](https://petooooo.github.io/notes/study-kdt-overview/)

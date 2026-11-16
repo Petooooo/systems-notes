@@ -1,0 +1,102 @@
+---
+title: "Dynamic Programming·Greedy·Tree 패턴 비교"
+description: "점화식과 상태 정의, greedy exchange argument, 트리·segment tree·heap의 연산 복잡도를 구현 반례 중심으로 정리한다."
+date: "2026-11-16"
+draft: false
+reviewed: true
+sensitivity: public
+slug: "study-dp-greedy-trees"
+area: "Algorithms"
+category: "Study"
+type: "concept"
+series: "OSLab Preparation"
+tags: ["dp", "greedy", "tree", "segment-tree", "heap"]
+---
+
+## 1. 문제 풀이를 외우기보다 정당성을 증명하기
+
+Dynamic programming과 greedy는 모두 문제를 더 작은 결정으로 나누지만 **언제 이전 결과를 기억하고 언제 국소 최선의 선택이 전체 최선이 되는지**가 다르다.
+
+## 2. Dynamic Programming의 조건
+
+DP를 사용하려면 상태를 정의하고, 부분문제 사이의 의존 관계와 점화식을 찾아야 한다.
+
+| 구성 | 질문 |
+| --- | --- |
+| State | 어떤 정보가 같으면 이후의 선택이 동일한가 |
+| Transition | 현재 상태는 이전 상태와 어떻게 연결되는가 |
+| Base case | 가장 작은 문제의 답은 |
+| Evaluation order | 필요한 상태가 이미 계산됐는가 |
+| Answer | 어느 상태를 최종 결과로 사용할까 |
+| Memory | 모든 상태를 저장해야 하는가 |
+
+## 3. 예제: 계단 오르기 형태
+
+한 번에 1칸 또는 2칸을 오르는 경우의 수를 생각하면 `dp[n]=dp[n-1]+dp[n-2]`를 정의할 수 있다.
+
+```python
+def ways(n):
+    if n < 0:
+        return 0
+    a, b = 1, 1
+    for _ in range(n):
+        a, b = b, a + b
+    return a
+```
+
+이것은 **복습용 수학적 예제**이며 어떤 온라인 저지 문제의 정답을 그대로 나타내는 것은 아니다. 특정 문제에는 비용·제한 조건이 추가되어 점화식이 달라질 수 있다.
+
+## 4. Greedy는 왜 증명이 필요한가
+
+매 순간 가장 좋아 보이는 선택을 해도 이후 선택에 영향을 줘 전체 최적 결과가 깨질 수 있다. 따라서 greedy에는 보통 **exchange argument**나 구조적 성질이 필요하다.
+
+| 문제 모델 | Greedy 가능성 | 이유 |
+| --- | --- | --- |
+| 구간 스케줄링 | 끝나는 시간이 빠른 구간 우선 등 | 교환 논증 가능 |
+| 일반 0/1 Knapsack | 단순 가치/무게 정렬 불충분 | 분할 불가능성 |
+| Fractional Knapsack | 가치/무게 정렬 활용 | 물건을 분할할 수 있음 |
+| 최소 신장 트리 | Kruskal/Prim | Cut property |
+| 일반 coin change | 액면이 임의라면 단순 큰 동전 우선 오류 | 반례 존재 가능 |
+
+**국소적으로 빠른 선택을 반복하는 코드**라는 이유로 greedy가 정답이 되는 것은 아니다.
+
+## 5. Tree와 Heap
+
+Tree는 사이클이 없는 연결 그래프이고, 일반적으로 n개 정점이면 n-1개 간선을 갖는다. Rooted tree에서는 parent/child와 depth, subtree 관계를 이용한다.
+
+Heap은 우선순위에 따라 최솟값/최댓값을 꺼내는 자료구조다. **Heap을 사용한다고 자동으로 모든 원소가 정렬되어 있는 것은 아니다.**
+
+## 6. Segment Tree
+
+Segment tree는 구간 합·최솟값 등 associative 연산을 여러 번 조회하고 값을 갱신할 때 유용하다. 일반적인 구현에서 build는 O(N), point update와 range query는 O(log N)으로 설계할 수 있다.
+
+하지만 입력 크기와 업데이트 여부에 따라 prefix sum이 더 단순할 수 있다. **구간 합 질의만 있고 수정이 없다면** O(N) 전처리 후 O(1) 질의가 가능하다.
+
+## 7. 대표 반례
+
+| 실수 | 반례 유형 |
+| --- | --- |
+| DP state가 부족 | 이전 선택이 이후 가능성을 바꾸는 경우 |
+| 점화식의 중복 계산 | Exponential recursion |
+| Greedy 선택의 증명 없음 | 임의 액면 동전 |
+| Segment tree 과용 | 업데이트 없는 단순 합 질의 |
+| Tree를 graph로 순회하며 parent 미제외 | 양방향 간선 무한 왕복 |
+| Overflow | 매우 큰 경우의 수 |
+
+## 8. 기록할 내용
+
+문제를 풀었으면 `상태/불변식 → 점화식/선택의 정당성 → 복잡도 → 실패 반례 → 코드 → 복습일` 순서로 정리한다. 어려운 문제일수록 **왜 정답이 맞는지**를 한 문장으로 설명할 수 있어야 한다.
+
+## 9. 복습 질문
+
+1. DP 상태를 최소화하면 어떤 오류가 생기는가?
+2. Greedy 선택이 안전하다는 것을 어떻게 설명할까?
+3. Heap과 binary search tree는 어떤 연산이 다른가?
+4. Prefix sum이 segment tree보다 유리한 상황은?
+5. Tree DFS와 일반 graph DFS에서 parent 처리는 왜 중요한가?
+
+## 참고자료
+
+- [CP-Algorithms: Dynamic Programming](https://cp-algorithms.com/dynamic_programming/intro-to-dp.html)
+- [CP-Algorithms: Segment Tree](https://cp-algorithms.com/data_structures/segment_tree.html)
+- [CP-Algorithms: Greedy](https://cp-algorithms.com/)
