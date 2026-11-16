@@ -1,457 +1,206 @@
 ---
-title: "OSLab 입학 준비와 Linux 커널·파일시스템·스토리지 학습 로드맵"
-description: "2026년 11월부터 2027년 석사 첫 학기까지 POSIX·스케줄러·가상 메모리·VFS·ext4/F2FS·NVMe, ftrace/eBPF, OSLab 논문, 코딩테스트 및 재현 실험을 주차별로 계획한다."
+title: "커널에서 저장장치까지"
+description: "프로세스, 가상 메모리, VFS와 블록 계층, NVMe·Flash를 따라가며 서로 연결되는 개념과 궁금한 지점을 모았다."
 date: "2026-11-15"
+updated: "2026-11-16"
 draft: false
 reviewed: true
 sensitivity: public
 slug: "study-roadmap"
-area: "Study Roadmap"
+area: "Index"
 category: "Study"
 type: "concept"
-series: "Graduate Preparation"
-tags: ["roadmap", "operating-systems", "filesystems", "storage", "kernel", "algorithms", "kaist"]
+tags: ["linux-kernel", "filesystems", "storage", "tracing", "memory", "algorithms"]
 ---
-## 전체 학습 노트 색인
 
-개념·커널 코드·파일시스템·스토리지·논문·코딩테스트를 다루는 **전체 기술 노트 29편**은 [학습 노트 전체 목차](https://petooooo.github.io/notes/study-curriculum/)에 분야별로 정리했다. 이 문서는 목표 일정과 검증 계획을 다루고, 각 노트는 기술적 메커니즘과 참고자료를 담는다. 글을 공개한 것과 실험을 검증한 것은 별개다.
+## 어디서부터 볼까
 
-## 0. 이 로드맵의 목적
+Linux에서 프로그램 하나가 동작할 때도 여러 계층이 동시에 움직인다. 프로세스가 실행되고, 메모리 주소가 변환되고, 파일 경로는 VFS를 거쳐 해석된다. 데이터가 실제 저장장치에 도달하기까지는 page cache와 writeback, block layer가 한 번 더 관여한다.
 
-2027년 봄 KAIST AI시스템학과 석사과정에 진학해 Operating Systems Laboratory(OSLab)에서 공부할 예정이다. 이 계획은 **2026년 11월 현재부터 입학 전까지의 준비, 석사 첫 학기, 이후 연구 주제 탐색**을 연결한 개인 학습 로드맵이다.
+K3s 기반 시스템을 운영하면서 장애를 복구하는 것과 **왜 그런 현상이 발생했는지 아래 계층까지 설명하는 것**이 다르다는 걸 자주 느꼈다. 그래서 관심이 가는 주제를 다음 흐름으로 묶었다.
 
-학부에서 컴퓨터공학·전자공학을 함께 공부했고, TFLite Micro memory planner와 FPGA CNN 가속기 프로젝트를 수행했다. Linux 내부 구조와 시스템 프로그래밍을 공부했고, 이후 실제 Linux/K3s 기반 시스템을 운영하면서 **서비스를 복구하는 것과 그 원인을 kernel/filesystem/storage 계층까지 설명하는 것은 다르다**는 사실을 느꼈다.
+[주제별 노트 모아보기](https://petooooo.github.io/notes/study-curriculum/)에서는 각 글을 바로 찾아볼 수 있다. 이 글은 **개별 기술이 어디에서 만나고, 어떤 순서로 읽으면 이해하기 쉬운지**에 초점을 둔다.
 
-따라서 이번에는 다양한 기술을 넓게 나열하기보다 **Linux kernel → VFS/file system → page cache/writeback → block layer/NVMe/Flash → 실험과 논문**을 주축으로 깊이를 만들려고 한다.
+## 프로세스가 실행될 때
 
-> **표기 원칙:** 이 문서는 앞으로의 계획이다. “읽기”, “구현”, “측정”은 완료 상태를 별도로 기록하며, 아직 수행하지 않은 실험을 실제 성과처럼 쓰지 않는다. 기존에 공부한 개념과 앞으로 새로 만들 실험은 구분한다.
+첫 번째 질문은 단순하다. **프로그램을 실행했을 때 커널은 무엇을 만들고 관리할까?**
 
-### 우선순위
+- 실행 파일과 프로세스는 다른 대상이다. `execve()`는 실행 이미지를 교체하고, `fork()`는 자식 프로세스를 만든다.
+- 프로세스마다 FD 번호는 따로 있지만, `fork()`나 `dup()`으로 열린 파일 상태를 공유할 수 있다.
+- 같은 주소 공간의 thread는 메모리를 공유하므로 lock과 memory ordering을 함께 고민해야 한다.
+- 스레드가 CPU에서 실행되지 않는 이유를 runnable 대기와 I/O·lock 등에 의한 sleep으로 나눈다.
 
-| 우선순위 | 영역 | 이유 |
-|---|---|---|
-| P0 | Linux OS 기본기: process, scheduling, VM, synchronization | 커널 소스와 성능 분석을 이해하기 위한 전제 |
-| P0 | VFS / ext4 / page cache / block I/O | 연구 관심을 가장 분명하게 표현하는 주축 |
-| P1 | C/C++ system programming, tracing, `perf`, eBPF | 구현과 실험을 실제로 수행하는 수단 |
-| P1 | Flash/SSD/NVMe/ZNS, crash consistency | OSLab storage 연구의 하위 계층 |
-| P1 | 알고리즘·자료구조 | 코딩테스트 준비와 코드 구현 기본기 |
-| P2 | xv6/Pintos, kernel module, tiny patch | 구현·디버깅 감각을 높이는 프로젝트 |
-| P2 | GPU I/O, memory tiering, distributed storage | 연구 주제가 구체화되면 확장할 후보 |
-| 지속 | 논문 읽기·영어 기술문서·재현성 | 연구자로서의 작업 방식 |
+관련 글:
 
-## 1. 공부한 내용과 앞으로 검증할 내용
+- [프로세스·스레드·파일 디스크립터](https://petooooo.github.io/notes/study-process-fd-lifecycle/)
+- [POSIX 시스템 프로그래밍](https://petooooo.github.io/notes/study-kdt-posix/)
+- [Mutex·Semaphore·Memory Ordering](https://petooooo.github.io/notes/study-concurrency-locking-memory-order/)
+- [CFS에서 EEVDF까지](https://petooooo.github.io/notes/study-scheduler-cfs-eevdf/)
 
-| 구분 | 현재까지의 근거 | 다음에 필요한 작업 |
-|---|---|---|
-| Linux system programming | 시스템 프로그래밍·학부 학습 | 작은 POSIX 코드를 재구현하고 실패 조건 테스트 |
-| ftrace/KernelShark | Raspberry Pi에서 함수/스케줄링 이벤트 관찰 경험 | 새로운 kernel에서 같은 목적의 trace 재수집 |
-| VFS/Flash filesystems | VFS 구조와 control flow 학습 | 실제 파일 I/O 소스 경로 추적, 성능 관측 |
-| K3s / storage 운영 | 실제 온프레미스 인프라 운영·장애 대응 | 커널·파일시스템 계층의 원인 분석을 격리된 실험으로 재현 |
-| OSLab 논문 | GAZE의 abstract/introduction 중심으로 검토 | 전체 본문·실험·비교 대상까지 깊이 읽기 |
-| Pintos/xv6 | 학습 후보로 정리 | 첫 구현 환경 구축 및 테스트 통과 증거 |
-| Kernel patch | 장기 목표 | 소스 수정·빌드·실험 로그가 쌓인 뒤 작은 수정부터 |
+확인하고 싶은 건 함수 이름을 얼마나 외우는지가 아니다. **`fork()` 뒤 파일 오프셋이 공유되는 이유**, **Runnable이 곧 Running이 아닌 이유**를 객체와 상태 변화로 설명할 수 있어야 한다.
 
-기존 학습에서 가장 아쉬웠던 것은 **개념을 안다고 생각하는 것과 실제 동작을 설명하거나 수정할 수 있는 것의 차이**다. 앞으로는 각 주제를 읽은 뒤 “정의, 코드 위치, 측정 방법, 남은 질문”을 짧게라도 기록하려고 한다.
+## 주소 공간과 실제 메모리
 
-## 2. 일주일 학습 운영 원칙
+`malloc()`의 반환값을 곧 물리 RAM이라고 보면 `mmap`, page fault, COW를 이해하기 어렵다.
 
-군 복무와 입학 준비를 병행하는 기간에는 무리한 시간표보다 **작고 반복 가능한 학습 단위**가 중요하다.
+| 눈에 보이는 것 | 내부에서 따져볼 것 |
+| --- | --- |
+| 프로세스의 VIRT | 주소 공간에 예약·매핑된 영역 |
+| RSS와 PSS | 실제 상주하는 페이지와 공유 비중 |
+| `mmap()` 성공 | 접근할 때 필요한 페이지가 모두 준비됐는가 |
+| Page fault | 잘못된 접근인가, demand paging인가 |
+| 컨테이너 OOM | Host pressure인가, cgroup limit인가 |
+| 느린 메모리 접근 | NUMA locality와 reclaim 영향은 무엇인가 |
 
-### 기본 루틴 예시
+여기서 메모리라는 주제는 파일시스템과 다시 연결된다. File-backed mapping과 page cache는 별개인 듯 보이지만 둘 다 파일 데이터가 RAM에 머무르는 방식을 설명한다.
 
-| 주기 | 학습 | 예상 분량 | 남길 것 |
-|---|---|---|---|
-| 주 2회 | OS/Kernel 개념과 소스 | 한 주제의 핵심 흐름 | 한국어 기술 노트 1개 |
-| 주 1~2회 | C/C++ 또는 tracing 실습 | 30~90분짜리 작은 재현 | 실행 환경·명령·결과 |
-| 주 2회 | 알고리즘·코딩테스트 | 문제 2~4개 또는 1패턴 집중 | 풀이·반례·복잡도 |
-| 주 1회 | 연구실 논문 읽기 | 1편의 일부 또는 1편 | 1쪽 리뷰/질문 |
-| 주말 | 정리·복습 | 진도보다 누락 확인 | 체크리스트 갱신 |
+- [가상 메모리·mmap·Page Fault·COW](https://petooooo.github.io/notes/study-virtual-memory-mmap-fault/)
+- [NUMA·Page Reclaim·Cgroup Memory](https://petooooo.github.io/notes/study-numa-reclaim-cgroups/)
 
-시간이 부족한 주에는 **커널 개념 1개 + 알고리즘 1문제 + 논문 2쪽**처럼 최소 단위만 유지해도 된다. 중요한 것은 계획표에 채워진 날짜가 아니라 **실제로 설명·재현할 수 있게 됐는가**다.
+## 커널 안에서 실제로 확인하기
 
-### 상태 표기
+개념을 이해했다고 생각해도 코드를 읽으면 막히는 경우가 많다. 커널 소스를 읽을 때는 **버전과 실행 조건부터 고정**하고, 사용자 API에서 출발해 해당 subsystem으로 내려가는 편이 낫다.
 
-- **Not started:** 읽거나 구현하지 않음.
-- **Reading:** 문서·소스 파악 중.
-- **Reproducing:** 예제/실험을 실제로 실행 중.
-- **Verified:** 환경·방법·결과를 기록했고 재현 가능함.
-- **Needs review:** 이해가 불확실하거나 결과가 예상과 다름.
+1. `read()`, `mmap()`, `sched_switch`처럼 출발점을 하나 정한다.
+2. 관련 커널 tag와 config를 기록한다.
+3. 상태를 관리하는 자료구조와 실제 호출 경로를 찾는다.
+4. tracepoint 또는 작은 테스트로 예상한 동작이 보이는지 살핀다.
+5. 설명되지 않는 분기는 그대로 남긴다.
 
-이 상태값은 GitHub issue, 프로젝트 보드나 노트의 간단한 표에서 관리하면 좋다.
+자주 쓰게 될 도구의 역할도 다르다.
 
-## 3. Phase A — 2026년 11월: OS 기본기와 시스템 콜
+| 도구 | 주로 답하는 질문 |
+| --- | --- |
+| `ftrace` / `trace-cmd` | 어떤 커널 이벤트가 언제 발생했는가 |
+| `perf` | CPU 시간과 하드웨어 이벤트가 어디에 쓰였는가 |
+| eBPF/BCC | 특정 kernel event를 어떻게 골라 수집할까 |
+| `crash` / vmcore | 시스템이 멈췄을 때 남은 상태는 무엇인가 |
+| QEMU·xv6·Pintos | 격리된 환경에서 OS의 기본 구조를 수정할 수 있는가 |
 
-목표는 대학원 면담에서 나왔던 기본 질문들을 **교재 문장을 암기하는 수준이 아니라 실제 시스템 흐름으로 설명할 수 있게 되는 것**이다.
+이전에 Raspberry Pi에서 ftrace와 KernelShark로 실행 경로를 관찰한 경험이 있다. 다음에는 이벤트를 시각화하는 것에서 끝내지 않고, **어떤 지연을 측정했으며 다른 원인은 어떻게 제외했는지** 기록하려 한다.
 
-### Week 1. 프로세스와 파일 디스크립터
+- [커널 소스 읽기](https://petooooo.github.io/notes/study-kernel-source-navigation/)
+- [ftrace로 스케줄러 지연 살펴보기](https://petooooo.github.io/notes/study-ftrace-scheduler-latency-lab/)
+- [perf·eBPF로 병목 좁히기](https://petooooo.github.io/notes/study-perf-ebpf-evidence/)
+- [Crash Dump 분석](https://petooooo.github.io/notes/study-kdt-crash-dump/)
+- [Embedded Linux와 Driver](https://petooooo.github.io/notes/study-kdt-embedded-linux/)
+- [xv6·Pintos](https://petooooo.github.io/notes/study-xv6-pintos-os-lab/)
+- [커널 빌드·디버깅·Patch](https://petooooo.github.io/notes/study-linux-kernel-build-debug-patch/)
 
-- Process와 thread의 주소 공간/자원 공유 차이
-- `fork`, `execve`, `waitpid`, exit state
-- File descriptor, open file description, inode, shared file offset
-- `open`/`read`/`write`/`close`의 반환값·오류
-- Pipe와 `dup`를 이용한 FD 상속 실습
+## 파일을 열고 데이터를 쓸 때
 
-**완료 기준:** 프로세스 두 개가 FD를 공유할 때 파일 오프셋이 달라지는 조건을 말로 설명하고, 작은 코드를 실행해 확인한다.
+가장 오래 붙잡고 싶은 부분이다.
 
-### Week 2. Virtual memory
+파일 경로는 `dentry`와 `inode`를 거쳐 해석되고, 열린 파일의 상태는 `struct file` 같은 커널 객체로 표현된다. Buffered I/O는 page cache에서 처리될 수 있으며, dirty data가 실제 장치에 기록되기까지는 시간이 걸릴 수 있다.
 
-- `malloc`과 allocator, `brk`와 `mmap`
-- VMA, page table, TLB, page fault
-- Anonymous vs file-backed memory
-- RSS/VIRT/PSS와 실제 물리 메모리
-- Copy-on-write와 `fork`
+그래서 다음 질문들이 자연스럽게 이어진다.
 
-**완료 기준:** page fault가 항상 오류가 아닌 이유, `mmap`을 했을 때 메모리가 언제 할당되는지 설명한다.
+- `write()`가 성공했는데 전원 장애 뒤 데이터가 사라질 수 있는가?
+- `fsync()`가 보장하는 범위는 정확히 어디까지인가?
+- `rename()`의 원자성과 디렉터리 엔트리의 지속성은 같은가?
+- 같은 파일을 두 번 열었을 때 두 FD는 무엇을 공유하는가?
+- 파일을 삭제했는데도 저장 공간이 회수되지 않을 수 있는 이유는?
 
-### Week 3. Synchronization과 CPU scheduling
+| 경계 | 중요한 객체·개념 |
+| --- | --- |
+| Application ↔ VFS | FD, file, dentry, inode |
+| VFS ↔ Page cache | Address space, folio |
+| Page cache ↔ Filesystem | Dirty data, writeback, journal |
+| Filesystem ↔ Block layer | bio, request, blk-mq |
+| Block layer ↔ Device | Queue, completion, flush |
 
-- Runnable/Running/Sleeping, context switch
-- Lock, mutex, semaphore, condition variable
-- CFS와 vruntime의 역사적 모델
-- Modern Linux의 EEVDF 관련 문서 검토
-- Priority inversion, deadlock와 starvation
+- [VFS와 Path Lookup](https://petooooo.github.io/notes/study-vfs-pathwalk-inode-file/)
+- [Page Cache·Writeback·fsync](https://petooooo.github.io/notes/study-page-cache-writeback-fsync/)
+- [bio·blk-mq·NVMe Queue](https://petooooo.github.io/notes/study-block-io-blk-mq-nvme/)
+- [ext4·JBD2·Crash Consistency](https://petooooo.github.io/notes/study-ext4-jbd2-crash-consistency/)
 
-**완료 기준:** CPU 사용률이 낮은데 지연이 큰 상황에서 runnable delay와 blocked delay를 구분할 증거를 설명한다.
+## SSD 아래에서 일어나는 일
 
-### Week 4. File API와 page cache
+NAND Flash는 데이터를 덮어쓰는 방식과 erase 단위에 제약이 있다. 그래서 FTL의 mapping, out-of-place update, GC, wear leveling이 필요하다.
 
-- VFS file, inode, dentry, superblock
-- Buffered I/O, page cache, dirty page, writeback
-- `fsync`/`fdatasync`, rename, directory sync 문제
-- I/O가 커널을 거쳐 block layer로 내려가는 과정
+그 위의 파일시스템도 공간을 관리한다. F2FS의 segment cleaning과 SSD 내부 GC는 서로 다른 계층의 작업이다. 어느 쪽이 얼마만큼의 비용을 만드는지 구별하는 데 관심이 간다.
 
-**완료 기준:** `write()` 반환과 crash durability가 다른 이유를 구체적인 호출 흐름으로 설명한다.
+ZNS는 여기서 한 단계 더 나아가 **Zone의 쓰기 위치와 공간 회수 책임 일부를 호스트에 노출**한다.
 
-## 4. Phase B — 2026년 12월: Linux 커널 구현과 관측
+- [F2FS·Segment Cleaning·GC](https://petooooo.github.io/notes/study-f2fs-log-gc-segments/)
+- [NAND Flash·FTL·Write Amplification](https://petooooo.github.io/notes/study-nand-ftl-write-amplification/)
+- [NVMe·ZNS·Zone Lifecycle](https://petooooo.github.io/notes/study-nvme-zns-zone-lifecycle/)
 
-개념을 다시 읽은 뒤에는 **실제 이벤트 또는 소스 코드**와 연결해야 한다.
+이 부분을 읽을 때는 **CPU가 상태를 관리하는 비용**과 **장치가 실제 데이터를 이동하는 비용**을 따로 살핀다. 둘을 묶어 단순히 “SSD가 느리다”고 표현하면 어느 계층을 고쳐야 할지 알 수 없다.
 
-### Week 5. Kernel source 탐색
+## 측정하기 전에 정할 것
 
-- 커널 소스 빌드·헤더·디버그 심볼의 관계
-- `kernel/sched/`, `mm/`, `fs/`, `block/`의 역할
-- `rg`/`cscope`/`ctags`/LSP 등을 이용한 심볼 찾기
-- 호출 경로를 한 함수에 고정하지 않고 subsystem 단위로 추적
+성능을 비교한다면 명령부터 실행하기보다 무엇을 검증하려는지 먼저 정해야 한다.
 
-**산출물:** “하나의 시스템 콜이 어느 계층을 거치는가”라는 주제로 소스 경로·버전을 포함한 노트.
+| 질문 | 통제할 조건 |
+| --- | --- |
+| 첫 읽기와 반복 읽기의 차이 | Cache 상태, 파일 크기 |
+| Buffered와 Direct I/O | Filesystem, 정렬, I/O 크기 |
+| `fsync` 비용 | 호출 간격, journal 설정 |
+| Queue depth 증가 효과 | I/O engine, workload, 장치 |
+| F2FS GC와 지연 | Free space, valid block 비율 |
+| SSD의 성능 변동 | 온도, 내부 cache, GC 상태 |
 
-### Week 6. ftrace / trace-cmd / KernelShark
+실험 기록에는 kernel, filesystem, mount option, 테스트 장치, workload, 측정 횟수, p50/p95/p99, 실제 출력 파일과 한계를 남긴다. **값이 없으면 빈칸으로 둔다.** 예상한 효과와 실제로 관찰한 결과를 섞지 않는 것이 중요하다.
 
-- `sched_switch` / `sched_wakeup` 이벤트
-- Runnable 대기 시간과 CPU 실행 시간
-- Trace 수집의 부하·파일 크기·시간 기준
-- 이전에 관찰했던 스케줄러 타임라인을 새로운 실험으로 검증
+- [fio Workload 설계](https://petooooo.github.io/notes/study-fio-workload-design/)
+- [Storage Mini-Lab](https://petooooo.github.io/notes/study-storage-mini-lab-method/)
+- [실험 재현성과 Baseline](https://petooooo.github.io/notes/study-experiment-reproducibility/)
 
-**산출물:** 같은 workload를 두 번 실행해 trace 시각화 이미지와 해석을 남긴다. 과거 실험의 구체적인 측정값을 임의로 복원하지 않는다.
+## 논문으로 이어지는 질문
 
-### Week 7. `perf`와 eBPF
+파일시스템·스토리지 논문은 같은 하위 계층을 다뤄도 병목으로 지목하는 부분이 서로 다르다.
 
-- `perf stat`, CPU cycles, instructions, cache miss
-- Sampling과 event tracing의 차이
-- eBPF verifier, map, ring buffer의 역할
-- BCC kprobe/kretprobe, 가능하면 tracepoint 우선 검토
-- Kernel version과 BTF 지원 확인
+| 주제 | 읽으면서 확인할 것 |
+| --- | --- |
+| GAZE | ZNS 환경에서 GC의 CPU-side 관리 비용과 pipeline |
+| D2FS | GC를 장치와 파일시스템 사이에서 어떻게 분담하는가 |
+| OPIMQ | Multi-queue 환경의 write ordering |
+| DJFS | Journaling transaction의 granularity와 경합 |
+| f2trace | NVMe queue-level tracing의 오버헤드 |
+| GPUDirect Storage | 저장장치에서 GPU까지의 데이터 이동 경로 |
 
-**산출물:** 동일 작업에 대한 aggregate metric과 event trace가 어떤 질문에 답하는지 비교.
+논문의 주장을 읽을 때는 **Problem → Mechanism → Evaluation**을 분리한다. 공개된 Abstract에서 확인한 설명과 본문의 구현·실험을 직접 검토한 결과는 다른 기록이다.
 
-### Week 8. Block I/O와 `fio`
+- [시스템 논문 읽기](https://petooooo.github.io/notes/study-systems-paper-reading-method/)
+- [GAZE와 ZNS GC](https://petooooo.github.io/notes/study-gaze-zns-gc-background/)
+- [D2FS·OPIMQ·DJFS](https://petooooo.github.io/notes/study-d2fs-opimq-djfs-reading-guide/)
+- [f2trace·GPU I/O](https://petooooo.github.io/notes/study-f2trace-gpudirect-io-context/)
+- [문제를 작은 연구 질문으로 바꾸기](https://petooooo.github.io/notes/study-systems-research-question-selection/)
 
-- Linux block layer, blk-mq, request queue
-- NVMe submission/completion queue의 기초
-- `fio` read/write, random/sequential, block size, queue depth
-- Page cache, direct I/O, fsync/fdatasync 설정의 차이
+## 구현과 알고리즘
 
-**산출물:** 테스트 전용 파일과 볼륨을 사용한 실험 방법·결과·오해하기 쉬운 지표 목록.
+커널과 파일시스템 코드만 읽어서는 구현 감각이 생기지 않는다. 작은 C/POSIX 코드로 API의 경계 조건을 확인하고, xv6/Pintos에서는 변경된 코드와 테스트 결과를 함께 남기는 편이 좋다.
 
-## 5. Phase C — 2027년 1월: File System과 Flash/SSD 심화
+알고리즘도 별도로 이어간다. 문제를 풀고 나면 **어떤 자료구조를 선택했고, 그 선택이 왜 맞는지**를 정리한다.
 
-이 단계의 목표는 OSLab의 파일시스템 논문을 읽을 때 **도입부의 문제 정의와 실험 절차를 실제 구현 계층과 연결하는 것**이다.
+- [복잡도·배열·해시·스택·큐](https://petooooo.github.io/notes/study-algorithms-complexity-structures/)
+- [Two Pointers·Binary Search](https://petooooo.github.io/notes/study-two-pointers-binary-search/)
+- [BFS·DFS·Dijkstra·Union-Find](https://petooooo.github.io/notes/study-graph-bfs-dijkstra/)
+- [DP·Greedy·Tree](https://petooooo.github.io/notes/study-dp-greedy-trees/)
 
-### Week 9. ext4와 Crash Consistency
+개념과 풀이 과정은 `notes/`, 실제 소스와 실행 결과는 `labs/`에 둔다. 코드를 실행했다면 사용한 버전과 입력, 관찰된 출력을 연결한다.
 
-- ext4 inode, extent, metadata, journal
-- Journaling mode와 데이터 지속성
-- `write` → dirty page → writeback → storage
-- `fsync`, flush, write ordering, power-failure semantics
-- Application transaction과 filesystem consistency 구분
+## 계속 남겨둘 질문
 
-**완료 기준:** 파일 변경 직후 장애가 나면 어떤 상태가 남을 수 있는지 논리적으로 설명한다.
+- VFS에서 실제 block I/O까지 어떤 소프트웨어 비용이 발생할까?
+- Dirty page의 writeback과 SSD 내부 GC는 tail latency에 어떻게 겹칠까?
+- Multi-queue에서 높은 throughput과 write ordering을 함께 얻기 위해 어떤 비용을 지불할까?
+- GC 도중 반복되는 memory allocation은 얼마나 비싼가?
+- ftrace나 eBPF에서 본 지연을 커널 소스의 구체적인 경로와 연결할 수 있을까?
+- GPU가 데이터를 기다릴 때 병목은 page cache, storage, transfer 중 어디에 있을까?
 
-### Week 10. F2FS와 Log-Structured Design
+이 질문들에 한꺼번에 답하려는 것은 아니다. 하나씩 좁혀 보고, 직접 확인한 내용이 생길 때마다 관련 노트에 덧붙인다.
 
-- Segment/section, log-structured allocation
-- Data relocation, valid block, free space
-- Garbage collection이 foreground I/O에 영향을 주는 이유
-- Flash SSD FTL과 파일시스템 GC의 차이
-- F2FS를 ext4와 같은 기준으로 비교하기 어려운 이유
+## 자료
 
-**완료 기준:** F2FS에서 GC가 왜 필요한지, SSD 내부 GC와 무엇이 다른지 설명한다.
-
-### Week 11. NVMe, ZNS와 Queueing
-
-- NVMe의 submission/completion queue
-- Queue depth, latency, throughput의 관계
-- Zoned Namespace, sequential zone write 규칙
-- Zone reset, open/active zone 제한
-- ZNS SSD에서 host filesystem이 관리하는 책임
-
-**완료 기준:** 기존 block SSD와 ZNS 장치에서 filesystem 설계가 달라지는 이유를 설명한다.
-
-### Week 12. 첫 번째 Storage Mini-Lab
-
-후보 실험:
-
-1. **Page cache cold vs warm** 상태 비교.
-2. **Buffered write와 sync write**의 응답 분포 비교.
-3. Block I/O request latency에 영향을 주는 workload 파라미터 비교.
-4. Test용 파일에서 `fio`로 sequential/random 패턴 비교.
-
-**반드시 기록:** 커널, 파일시스템, mount option, SSD/가상디스크 환경, cache state, 데이터 크기, 큐 깊이, 실행 횟수, median/p95/p99, 관측 도구의 overhead.
-
-디스크를 파괴하거나 운영 데이터를 변경하는 테스트는 하지 않는다.
-
-## 6. Phase D — 2027년 2월: 논문 정독과 연구 질문 찾기
-
-전역 후 연구실 참여·입학 준비와 병행할 단계다. 실제 일정은 연구실의 안내에 맞게 조정한다.
-
-### 읽기 순서: 문제의식에 따라
-
-| 우선 | 논문/연구 | 먼저 이해할 문제 |
-|---|---|---|
-| 1 | **GAZE** (SOSP 2026) | ZNS 환경 GC 중 CPU-side 상태/메모리 처리 병목과 pipeline |
-| 2 | **D2FS** (FAST 2025) | 파일시스템 GC를 device-driven 방식으로 바꾸는 이유 |
-| 3 | **OPIMQ** (FAST 2025) | Multi-queue block device에서 write ordering 보장 비용 |
-| 4 | **f2trace** (ICPADS 2026) | NVMe queue-level tracing의 메모리와 오버헤드 |
-| 5 | **DJFS** (FAST 2025) | 파일시스템 journaling의 granularity와 메타데이터 비용 |
-| 6 | **GPUDirect Storage 성능 특성** (NVMSA 2026 poster) | GPU와 SSD 사이의 데이터 경로 및 병목 |
-| 선택 | **CJFS / IPLFS / lwFSCK** | Journaling concurrency, GC 대안, recovery 비용 |
-
-논문 제목·발표 정보는 [OSLab Publications](https://oslab.kaist.ac.kr/publications/)에서 확인했다. GAZE는 이전에 abstract/introduction 중심으로 검토했지만 **전체 설계·실험을 정독한 것으로 표시하지 않는다**.
-
-### 한 편을 읽는 순서
-
-1. 제목과 Abstract — 해결하려는 문제는 무엇인가?
-2. Introduction — 왜 지금 중요하며 기존 방법의 한계는?
-3. Background — OS·storage 지식이 부족한 지점은?
-4. Motivation — 어떤 프로파일링 결과가 문제를 증명하는가?
-5. Design — 어떤 구조를 바꿨는가?
-6. Implementation — 실제로 어디에 구현했는가?
-7. Evaluation — baseline과 workload가 공정한가?
-8. Limitations — 적용하기 어려운 경우는?
-9. My questions — 직접 검증하고 싶은 가설은?
-
-### 논문 리뷰 템플릿
-
-| 질문 | 작성 기준 |
-|---|---|
-| Research question | 한 문장으로 정의 |
-| Motivation | 정량 근거가 있다면 표기 |
-| Baseline | 기존 시스템·설정·비교 조건 |
-| Mechanism | 핵심 변경점을 그림이나 경로로 설명 |
-| Evidence | 수치가 어느 workload·장치에서 나왔는지 |
-| Limitations | 장치 종속성, 재현 제약, 추가 비용 |
-| Next experiment | 스스로 검증할 수 있는 작은 실험 |
-
-가능하다면 **주 1편**을 읽되, 한 편을 정확히 이해하지 못했다면 두 번째 논문으로 넘어가기보다 실험/배경 지식을 보완한다.
-
-## 7. Phase E — 2027년 봄학기: 연구실 입문과 Coursework
-
-연구실에 참여한 뒤에는 아래 계획을 실제 과제·연구 지도에 맞게 조정한다.
-
-### 1~4주: 환경과 재현성
-
-- 연구용 Linux 환경, 소스 버전, 빌드 도구 파악
-- 분석/실험용 데이터와 공개 가능 범위 구분
-- 기본 baseline 실행 및 로그 기록
-- 공동 작업 방식과 코드 리뷰 흐름 익히기
-- 논문·실험 관리 노트의 형식 정리
-
-### 5~8주: 후보 문제 검토
-
-- Kernel/VFS/block I/O 중 직접 설명 가능한 경로 선택
-- 논문에서 제시된 병목이 실제 환경에서도 나타나는지 확인
-- 작은 실험을 통해 가설 1개를 반박 또는 지지
-- 최소 재현 코드 또는 측정 스크립트 정리
-- 성능과 정확성/일관성 측면의 trade-off 기록
-
-### 9~16주: 작은 연구 과제로 압축
-
-- 문제 정의와 baseline
-- 병목에 대한 가설
-- 대안 mechanism 1~2개
-- 구현 난도와 예상 위험
-- 측정 계획, 결과 해석, negative result 기록
-- 지도교수·연구실 피드백을 반영해 범위 축소
-
-목표는 초반부터 큰 논문을 쓰는 것이 아니라 **문제 → 메커니즘 → 검증**의 과정을 하나 끝까지 반복해 보는 것이다.
-
-## 8. 이후 확장 트랙
-
-연구 주제는 입학 후 정해질 수 있으므로 현재는 세 후보만 유지한다.
-
-### Track A — Linux File Systems / Storage (우선)
-
-VFS, ext4/XFS/F2FS, journaling, page cache, blk-mq, NVMe, ZNS/SSD. 가장 직접적인 관심과 연구실 연구축에 맞는다.
-
-### Track B — Memory & Hardware-Aware Systems
-
-Page reclaim, `mmap`, NUMA, tiered memory, CXL, GPU memory/I/O와 하드웨어 자원 관리. TFLite Micro memory planning 경험과 연결할 수 있다.
-
-### Track C — Distributed/AI Infrastructure
-
-Kubernetes, persistent volumes, distributed storage reliability, GPU serving, data pipeline. 이미 수행한 운영 경험을 연구 질문으로 발전시킬 때 선택한다.
-
-현재 방향은 **A를 주축으로, B/C는 연구 필요에 따라 연결**하는 것이다. 세 트랙을 동시에 깊게 공부하겠다는 뜻은 아니다.
-
-## 9. Coding Test 준비 계획
-
-코딩테스트는 연구 준비와 별개로 계속 유지한다.
-
-### 기초 유형 순서
-
-1. Array/String, Hash Map, Stack/Queue
-2. Sorting, binary search, two pointers
-3. DFS/BFS, graph representation
-4. Shortest path, heap, union-find
-5. Dynamic programming, greedy
-6. Trees, traversal, segment tree (필요할 때)
-7. 문제 풀이 패턴과 복잡도 분석
-
-### 풀이 기록 방식
-
-| 항목 | 적을 내용 |
-|---|---|
-| Source | 백준/프로그래머스 등 링크 |
-| Attempt | 첫 접근과 생각한 자료구조 |
-| Complexity | 시간·공간 복잡도 |
-| Mistake | 오답·시간 초과·반례 |
-| Improvement | 더 나은 접근이 가능한가 |
-| Review date | 다시 풀 날짜 |
-
-**복습 기준:** 맞혔더라도 풀이 이유를 설명할 수 없거나 경계 조건을 놓쳤다면 복습 대상이다. 풀이 코드는 [Algorithms labs](https://github.com/Petooooo/systems-notes/tree/main/labs/algorithms)에 보관한다.
-
-## 10. xv6·Pintos·Linux Kernel 실습 순서
-
-### Step 1. OS 교육용 환경
-
-xv6 또는 Pintos 중 하나만 먼저 선택한다. 둘 다 동시에 시작하지 않는다.
-
-- 빌드·부팅·테스트 환경 준비
-- Process/thread와 system call 구조 읽기
-- Scheduler 또는 VM 관련 작은 기능 구현
-- 테스트 케이스를 통해 동작 확인
-- 변경 전후 결과와 코드 차이 기록
-
-### Step 2. Linux 소스와 tracing
-
-- 커널 버전 고정
-- 관심 subsystem의 함수 호출 흐름 읽기
-- ftrace, perf 또는 eBPF로 가설 확인
-- 재현 가능한 workload와 결과 저장
-
-### Step 3. Small patch
-
-처음부터 새 파일시스템을 만들기보다 **작은 버그 수정, 문서 개선, 측정 도구, 로그 관측 개선**부터 검토한다. Upstream 제출은 코드 품질과 프로젝트 유지보수 정책을 이해한 뒤에 진행한다.
-
-## 11. 실험의 품질 기준
-
-커널·파일시스템 실험에서 **수치만 좋으면 성공**이라는 사고를 피하려고 한다.
-
-### 실험 기록의 필수 정보
-
-- Hardware: CPU, RAM, storage device / 가상 장치 여부
-- Software: distro, kernel version, filesystem, mount options
-- Workload: 파일 크기, block size, read/write 비율, queue depth, thread 수
-- Metric: throughput, mean latency, p50/p95/p99, CPU, memory
-- Baseline: 비교 대상의 동일 조건
-- Repeat: 반복 횟수, 변동폭, warmup 여부
-- Correctness: 데이터 일관성·정확성·복구 조건
-- Limitations: 결과의 일반화 가능 범위
-
-### Negative result를 남기기
-
-실험이 실패했거나 기대한 성능 개선이 나오지 않아도 **재현 환경, 기존 가설, 왜 가설을 수정했는지**는 중요한 기록이다. 성과를 멋있게 보이게 만들기 위해 실패 사례를 지우지 않는다.
-
-## 12. 수업·논문·실험을 연결하는 기록 구조
-
-| 종류 | 저장 위치 | 글의 언어 |
-|---|---|---|
-| 기술 개념 정리 | `notes/linux-kernel/`, `notes/storage/` | 제목·본문 한국어 |
-| 대학원 수업 정리 | `notes/graduate/` | 제목·본문 한국어 |
-| 논문 리뷰 | `notes/graduate/` | 제목·본문 한국어 |
-| C/C++ 실습 코드 | `labs/system-programming/`, `labs/kernel/` | 코드·식별자 원문 |
-| 파일시스템 실험 | `labs/storage/` | 코드·측정값 원문, 설명 한국어 |
-| 알고리즘 풀이 | `labs/algorithms/` | 코드 원문, 풀이 한국어 |
-| Linux 시스템 복습 | `notes/linux-kernel/`, `notes/system-programming/` | 제목·본문 한국어 |
-
-README, 폴더 이름, `area`, `category`, `type`, `tags`, `slug`는 영어로 유지한다.
-
-## 13. 마일스톤과 산출물
-
-| 시점 | 검증할 목표 | 남길 증거 |
-|---|---|---|
-| 2026년 11월 말 | POSIX/VM/Scheduler 개념을 설명할 수 있음 | 학습 노트 + 작은 코드 |
-| 2026년 12월 말 | ftrace/perf로 Linux 동작을 관찰할 수 있음 | 실행 환경·trace·해석 |
-| 2027년 1월 말 | VFS/ext4/F2FS/blk-mq/NVMe 기본 경로 이해 | 소스 경로도·I/O mini-lab |
-| 2027년 2월 말 | 논문 3~5편의 문제·설계·실험 비교 | 논문 리뷰·검증 질문 |
-| 2027년 첫 학기 중 | 좁은 연구 문제 1~2개 후보 정의 | baseline·실험 계획 |
-| 연구 주제 확정 뒤 | 작은 구현 변경을 정량 검증 | 코드·재현 스크립트·분석 |
-
-이것들은 **희망 목표**이며, 날짜가 되면 자동으로 완료되는 업무 목록이 아니다. 매월 실제 진행률과 필요에 따라 조정한다.
-
-## 14. 공부가 막혔을 때의 판단 기준
-
-| 막히는 상황 | 대응 |
-|---|---|
-| 커널 소스를 읽어도 함수 관계가 보이지 않음 | system call/API에서 출발해 호출 경로 범위 좁히기 |
-| 논문이 너무 어려움 | 배경 subsystem을 1~2개만 먼저 복습 |
-| 실험 결과가 일정하지 않음 | 환경·캐시·warmup·동시 부하 통제 |
-| 시간이 부족함 | P0 주제 한 개만 이어가기 |
-| 알고리즘 풀이가 반복해서 막힘 | 유형을 줄이고 반례·복잡도 복습 |
-| 실습이 실패함 | 실패 상태·로그·가설을 그대로 기록 |
-| 연구 방향이 흔들림 | 구현 가능한 실험 1개로 문제 범위 좁히기 |
-
-## 15. 내가 앞으로 답하고 싶은 질문
-
-- VFS에서 실제 block I/O까지 어떤 소프트웨어 오버헤드가 있는가?
-- 파일시스템의 write ordering과 SSD의 내부 동작은 어떻게 상호작용하는가?
-- Flash GC와 memory allocation이 tail latency에 얼마나 영향을 주는가?
-- NVMe 다중 큐에서 요청 순서와 성능은 어떤 trade-off를 갖는가?
-- eBPF/ftrace로 찾은 병목을 코드 수준에서 어떻게 개선할 수 있는가?
-- GPU workload가 저장장치 데이터를 사용할 때 병목은 어느 계층에 있는가?
-- 상위의 storage recovery 문제를 파일시스템/블록 계층의 증거로 얼마나 설명할 수 있는가?
-
-위 질문을 지금 모두 해결할 필요는 없다. **하나를 작게 구현하고, 측정하고, 설명하는 능력**을 만드는 것이 가장 중요한 목표다.
-
-## 16. 참고자료
-
-### OS / Kernel
 - [Operating Systems: Three Easy Pieces](https://pages.cs.wisc.edu/~remzi/OSTEP/)
 - [Linux Kernel Documentation](https://docs.kernel.org/)
-- [Linux Kernel Labs](https://linux-kernel-labs.github.io/refs/heads/master/)
-- [Pintos Projects](https://web.stanford.edu/class/cs140/projects/pintos/pintos.html)
-
-### Filesystems / Storage
 - [Linux VFS](https://docs.kernel.org/filesystems/vfs.html)
 - [ext4](https://docs.kernel.org/filesystems/ext4/)
 - [F2FS](https://docs.kernel.org/filesystems/f2fs.html)
 - [Linux Block Layer](https://docs.kernel.org/block/)
 - [NVMe Specifications](https://nvmexpress.org/specifications/)
-
-### Performance / Tracing
-- [Linux tracing](https://docs.kernel.org/trace/)
-- [Linux perf wiki](https://perf.wiki.kernel.org/)
-- [BCC](https://github.com/iovisor/bcc)
+- [Linux Tracing](https://docs.kernel.org/trace/)
 - [fio](https://fio.readthedocs.io/)
-
-### OSLab 연구
-- [KAIST OS Lab Publications](https://oslab.kaist.ac.kr/publications/)
-- [KAIST의 GAZE 연구 소개](https://kaist.ac.kr/site/news/html/news/?GotoPage=1&mng_no=69310&mode=V)
-
-### 내 복습 노트
-- [Linux 시스템 전체 흐름](https://petooooo.github.io/notes/study-kdt-overview/)
-- [POSIX System Programming](https://petooooo.github.io/notes/study-kdt-posix/)
-- [Scheduler, VM, VFS](https://petooooo.github.io/notes/study-kdt-kernel-vfs-memory/)
-- [Embedded Linux / Drivers](https://petooooo.github.io/notes/study-kdt-embedded-linux/)
-- [Kernel Crash Dump](https://petooooo.github.io/notes/study-kdt-crash-dump/)
-- [eBPF / BCC / Observability](https://petooooo.github.io/notes/study-kdt-ebpf-observability/)
+- [OSLab Publications](https://oslab.kaist.ac.kr/publications/)

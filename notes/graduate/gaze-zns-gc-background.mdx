@@ -1,6 +1,6 @@
 ---
-title: "GAZE를 이해하기 위한 ZNS GC·메모리 관리 배경"
-description: "GAZE(SOSP 2026)의 공개 문제 정의를 바탕으로 zone GC의 CPU-side 병목, pipeline, preallocation, write admission을 분석할 질문으로 정리한다."
+title: "GAZE: ZNS에서 GC가 병목이 되는 이유"
+description: "ZNS 환경에서 GC의 CPU-side 상태 관리와 실제 데이터 이동이 만드는 비용. GAZE가 살펴본 설계 선택을 따라간다."
 date: "2026-11-16"
 draft: false
 reviewed: true
@@ -9,15 +9,14 @@ slug: "study-gaze-zns-gc-background"
 area: "Graduate Study"
 category: "Study"
 type: "concept"
-series: "OSLab Preparation"
 tags: ["gaze", "zns", "garbage-collection", "f2fs", "research"]
 ---
 
-## 1. 이 글의 위치: 완독 리뷰가 아닌 배경 학습
+## 1. ZNS에서 GC의 어느 부분이 느릴까?
 
-GAZE는 OSLab의 SOSP 2026 연구로, **Zoned Namespace Flash Storage에서 log-structured 파일시스템의 garbage collection을 재설계**한다. 연구실이 공개한 설명에 따르면 zone 단위 GC에서 디바이스 I/O만이 아니라 **CPU-side 파일시스템 상태 관리와 메모리 관리**가 큰 병목이 될 수 있다.
+GAZE(SOSP 2026)는 **Zoned Namespace Flash Storage에서 log-structured 파일시스템의 garbage collection을 재설계**하는 연구다. 연구실이 공개한 설명에 따르면 zone 단위 GC에서 디바이스 I/O만이 아니라 **CPU-side 파일시스템 상태 관리와 메모리 관리**가 큰 병목이 될 수 있다.
 
-여기서는 공개 Abstract/연구 소개에 기반한 문제 정의와, 내가 추가로 공부해야 할 Linux 메커니즘을 구분한다. 전체 논문의 그림·알고리즘을 이미 완독하거나 구현을 재현했다고 쓰지 않는다.
+먼저 공개된 Abstract와 연구 소개를 바탕으로 GC 경로를 나눠 본다. 실제 구현의 세부 분기와 성능 평가 조건은 논문 본문에서 확인할 부분으로 남겨 둔다.
 
 ![논문 문제·설계·실험을 분리한 학습 지도](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/roadmap/paper-map.svg)
 
@@ -44,7 +43,7 @@ ZNS에서는 **큰 zone 단위의 회수**가 필요할 수 있어, 기존의 �
 2. **필요한 메모리를 미리 확보**해 반복적인 allocation 비용을 줄이는 방향.
 3. GC 중에도 적절한 buffered write를 허용할 수 있도록 **write admission policy**를 재설계하는 방향.
 
-연구실 자료에는 F2FS 대비 GC 시간 및 처리량 개선도 소개돼 있지만, 수치를 내가 재현한 결과로 표시하지 않는다. 실제 workload와 baseline 조건을 읽어야 어떤 범위에 적용되는지 판단할 수 있다.
+공개 자료에는 F2FS 대비 GC 시간과 처리량의 개선도 제시되어 있다. 다만 수치만으로 모든 workload에 같은 효과가 있다고 볼 수는 없다. 장치와 baseline, 실험 조건을 같이 읽어야 한다.
 
 ## 4. CPU 병목과 I/O 병목을 구분하는 방법
 
@@ -57,7 +56,7 @@ GC 시간이 길다고 해서 무조건 SSD 속도가 느리다는 뜻은 아니
 | GC 동안 foreground latency 급증 | 경쟁 또는 write admission | Admission policy, queue |
 | 임시 allocation 증가 | Page/heap allocation 비용 | Allocation trace, 메모리 압력 |
 
-표는 **가능한 가설을 세우는 연습**이지 GAZE 실험의 원시 수치를 재구성한 것이 아니다.
+이 표는 실제 측정값이 아니라, 병목 위치를 판단할 때 확인해 볼 단서들이다.
 
 ## 5. Pipeline 설계의 trade-off
 
@@ -80,7 +79,7 @@ GC 중 모든 쓰기를 막는 구조와, 특정 조건에서 buffered write를 
 
 이 부분이 F2FS, page cache, crash consistency가 연구 주제와 연결되는 지점이다.
 
-## 8. 논문 정독 시 확인할 실험 질문
+## 8. 원문에서 확인할 것
 
 1. 어떤 장치와 zone 크기를 사용했는가?
 2. Baseline F2FS는 어떤 버전과 정책인가?
@@ -90,7 +89,7 @@ GC 중 모든 쓰기를 막는 구조와, 특정 조건에서 buffered write를 
 6. Foreground write를 허용하면서 correctness는 어떻게 검증했는가?
 7. 성능 개선이 적은 workload는 무엇인가?
 
-## 9. 다음에 직접 할 수 있는 소규모 검증
+## 9. 직접 측정한다면
 
 GAZE를 복제하는 큰 실험보다, **일반적인 background GC 또는 파일 이동 workload에서 stage별 CPU/I/O 시간을 분리**하는 작은 실험부터 진행할 수 있다. 장치/파일시스템이 다르면 논문 주장과 같은 결과가 나올 것으로 기대하지 않는다.
 

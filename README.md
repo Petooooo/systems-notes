@@ -1,8 +1,8 @@
 # Systems Notes
 
-A public, versioned notebook for my study of **operating systems, Linux internals, file systems, storage, computer architecture, system programming, algorithms, and graduate research**.
+Notes on **Linux internals, file systems, storage, system programming, and algorithms**.
 
-The primary goal is to retain explanations, examples, experiments, and questions that I can return to later. The repository is the **source of truth** for the [Notes section of my website](https://petooooo.github.io/notes/). My engineering projects and career information remain in the [portfolio](https://petooooo.github.io/projects/).
+I keep explanations and references here, with runnable code and measurements under `labs/`. Published articles also appear on [my website](https://petooooo.github.io/notes/); projects and experience are in the [portfolio](https://petooooo.github.io/projects/).
 
 ## Language convention
 
@@ -14,14 +14,14 @@ The primary goal is to retain explanations, examples, experiments, and questions
 | Study article **explanations and main body** | **Korean** |
 | Code, identifiers, commands, standards, paper titles | Original technical language |
 
-This convention applies to **new and edited notes**. Existing older notes may have been written before it was established; they can be improved gradually without changing their URLs.
+Older notes retain their URLs even when the writing is revised.
 
 ## Read the notes
 
 | Track | Contents |
 | --- | --- |
-| [Complete Study Curriculum](notes/study-curriculum.mdx) | All 29 topic articles, learning sequence, experiment boundaries and links grouped by track |
-| [Study Roadmap](notes/study-roadmap.mdx) | Detailed preparation for KAIST OS Lab, with weekly milestones, experiments, paper reading, and interview preparation |
+| [Topic index](notes/study-curriculum.mdx) | Browse articles by subject |
+| [Kernel to storage](notes/study-roadmap.mdx) | How processes, memory, file systems and block I/O connect |
 | [Linux Systems Foundations](notes/linux-kernel/kdt-overview.mdx) | A six-article learning series on Linux/POSIX, scheduling, VM, VFS, drivers, crash analysis, and observability |
 | [System Programming](notes/system-programming/) | POSIX processes, threads, synchronization, IPC, sockets and event-driven I/O |
 | [Linux Kernel](notes/linux-kernel/) | Scheduler, memory management, tracing, debugging, interrupt and driver internals |
@@ -30,9 +30,9 @@ This convention applies to **new and edited notes**. Existing older notes may ha
 | [Undergraduate Courses](notes/undergraduate/) | Computer science, computer architecture, networking, digital hardware and related coursework |
 | [Graduate Study](notes/graduate/) | Graduate coursework, paper reviews, reproductions, and public research notes |
 
-### Linux systems foundations
+### Earlier Linux notes
 
-- [Course overview](notes/linux-kernel/kdt-overview.mdx)
+- [Linux internals overview](notes/linux-kernel/kdt-overview.mdx)
 - [POSIX programming, IPC and sockets](notes/system-programming/kdt-posix.mdx)
 - [Scheduler, virtual memory, VFS and storage](notes/linux-kernel/kdt-kernel-vfs-memory.mdx)
 - [Embedded Linux and drivers](notes/linux-kernel/kdt-embedded-linux.mdx)

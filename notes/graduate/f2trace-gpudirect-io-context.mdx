@@ -1,6 +1,6 @@
 ---
 title: "f2trace·GPUDirect Storage: I/O 관측과 GPU 데이터 경로"
-description: "NVMe queue-level tracing과 GPUDirect Storage를 이해하기 위해 block I/O 경로, trace 오버헤드, DMA·data movement를 정리한다."
+description: "NVMe Queue에서 이벤트를 기록하는 비용, SSD에서 GPU까지 데이터를 옮기는 비용을 각각 살펴본다."
 date: "2026-11-16"
 draft: false
 reviewed: true
@@ -9,7 +9,6 @@ slug: "study-f2trace-gpudirect-io-context"
 area: "Graduate Study"
 category: "Study"
 type: "concept"
-series: "OSLab Preparation"
 tags: ["f2trace", "gpudirect-storage", "nvme", "io-tracing", "gpu"]
 ---
 
@@ -17,7 +16,7 @@ tags: ["f2trace", "gpudirect-storage", "nvme", "io-tracing", "gpu"]
 
 저장장치의 완료 시간과 애플리케이션이 체감하는 지연에는 **파일시스템·block queue·CPU 처리·메모리 복사·GPU 데이터 준비** 등 여러 비용이 있다.
 
-OSLab의 공개 연구 목록에는 **f2trace: Low-Overhead Memory-Efficient NVMe Queue-Level I/O Tracer(ICPADS 2026)**와 **Understanding the Performance Characteristics of GPUDirect Storage(NVMSA 2026 poster)**가 있다. 이 글은 두 연구를 읽기 위한 배경과 측정 질문을 정리한 것이며 공개 논문 전체를 재현한 글이 아니다.
+**f2trace: Low-Overhead Memory-Efficient NVMe Queue-Level I/O Tracer(ICPADS 2026)**와 **Understanding the Performance Characteristics of GPUDirect Storage(NVMSA 2026 poster)**를 나란히 놓으면 서로 다른 질문이 보인다. 하나는 NVMe 큐에서 이벤트를 기록하는 비용, 다른 하나는 저장장치에서 GPU까지 데이터가 이동하는 비용을 다룬다. 이 글에서는 두 경로를 먼저 분리해 본다.
 
 ![Storage에서 GPU 계산까지의 단계적 경로](https://raw.githubusercontent.com/Petooooo/systems-notes/main/assets/roadmap/gpu-io.svg)
 
@@ -34,7 +33,7 @@ OSLab의 공개 연구 목록에는 **f2trace: Low-Overhead Memory-Efficient NVM
 
 이 경계가 분명해야 “NVMe latency를 측정한다”면서 다른 비용을 섞는 실수를 줄일 수 있다.
 
-## 3. f2trace를 이해하기 위한 질문
+## 3. NVMe 큐에서는 무엇을 기록할까?
 
 제목이 강조하는 것은 **NVMe queue 수준의 추적, 낮은 오버헤드, 메모리 효율**이다. 그렇다면 일반적인 block trace보다 무엇이 더 구체적으로 필요할까?
 
@@ -74,7 +73,7 @@ GPUDirect Storage는 특정 환경에서 host-mediated copy와 data movement 경
 | GPU idle time | 데이터를 기다리느라 계산이 멈추는가 |
 | Trace overhead | 계측 때문에 결과가 변하는가 |
 
-## 6. 학습 순서
+## 6. 코드와 자료를 따라간다면
 
 1. NVMe SQ/CQ와 blk-mq 구조 복습.
 2. Block request issue/complete 관계 이해.
@@ -84,7 +83,7 @@ GPUDirect Storage는 특정 환경에서 host-mediated copy와 data movement 경
 6. 논문 원문의 implementation/evaluation 읽기.
 7. 통제된 pipeline benchmark를 설계한다.
 
-## 7. 새 실험이 필요할 때
+## 7. 직접 확인한다면
 
 GDS 지원 장치가 없다면 **일반 buffered I/O와 GPU 계산을 이어 붙인 synthetic pipeline**의 비용을 먼저 분해할 수 있다. 이것은 실제 GPUDirect Storage 성능 측정과 다르므로 결과 제목에 분명히 표시해야 한다.
 

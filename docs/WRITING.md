@@ -75,7 +75,7 @@ Store runnable code and results under `labs/`; conceptual notes can link to lab 
 
 ## Study roadmap maintenance
 
-The [roadmap](../notes/study-roadmap.mdx) is a **plan**, not a record of completed work. Record what was finished and revise target dates when necessary. Research-paper familiarity, implementation work and verified experiments must remain separate states.
+The [kernel-to-storage reading guide](../notes/study-roadmap.mdx) connects topics; the [topic index](../notes/study-curriculum.mdx) links individual articles. Treat technical notes, executed labs, and verified measurements as different kinds of evidence.
 
 ## Public safety and disclosure
 

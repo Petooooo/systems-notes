@@ -236,7 +236,7 @@ Buffered write는 데이터가 page cache에서 dirty 상태가 된 뒤 나중�
 | blk-mq | Linux block layer의 다중 queue 메커니즘 |
 | ZNS | 영역 단위 write 규칙 등 새로운 device-level 제약 |
 
-OSLab 준비에서 특히 중요하게 본 부분은 **VFS에서 시작한 I/O 요청이 NVMe 장치까지 내려가며 어디에서 비용이 발생하는가**다. 컨테이너에서 PVC를 쓰는 상위 경험을 이 경로의 구현과 연결하고 싶다.
+특히 궁금했던 부분은 **VFS에서 시작한 I/O 요청이 NVMe 장치까지 내려가는 동안 비용이 어디에서 발생하는가**였다. 컨테이너에서 PVC를 쓰는 상위 경험을 이 경로의 구현과 연결하고 싶다.
 
 ## 12. 세 분야를 한 번에 연결한 예제
 

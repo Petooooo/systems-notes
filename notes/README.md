@@ -2,8 +2,8 @@
 
 This directory contains **Korean-language study articles**, organized with English folder names and metadata.
 
-- [Complete study curriculum](study-curriculum.mdx) — full index of operating systems, kernel, storage, research, and algorithm articles
-- [Study roadmap](study-roadmap.mdx) — KAIST OS Lab preparation, kernel and storage foundations, algorithms, research papers, and reproducible experiments
+- [Topic index](study-curriculum.mdx) — notes grouped by subject
+- [Kernel to storage](study-roadmap.mdx) — the connections between processes, memory, VFS, block I/O and flash
 - [Linux kernel](linux-kernel/) — scheduling, memory, VFS, tracing, drivers, crash analysis
 - [System programming](system-programming/) — POSIX, IPC, concurrency, and sockets
 - [Storage & file systems](storage/) — ext4/F2FS, page cache, NVMe, Flash and filesystem recovery
@@ -11,9 +11,9 @@ This directory contains **Korean-language study articles**, organized with Engli
 - [Undergraduate courses](undergraduate/) — CS and electronic engineering reviews
 - [Graduate study](graduate/) — research-oriented reading and class notes
 
-### Linux systems foundations
+### Earlier Linux notes
 
-- [Course overview](linux-kernel/kdt-overview.mdx)
+- [Linux internals overview](linux-kernel/kdt-overview.mdx)
 - [POSIX programming](system-programming/kdt-posix.mdx)
 - [Kernel, virtual memory and VFS](linux-kernel/kdt-kernel-vfs-memory.mdx)
 - [Embedded Linux and drivers](linux-kernel/kdt-embedded-linux.mdx)

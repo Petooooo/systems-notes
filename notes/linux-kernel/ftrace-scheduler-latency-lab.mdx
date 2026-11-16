@@ -1,5 +1,5 @@
 ---
-title: "ftrace로 스케줄러 지연을 분석하는 방법"
+title: "ftrace로 보는 스케줄러 지연"
 description: "sched_wakeup/sched_switch를 이용한 Runnable 지연 분석, tracing 오버헤드와 실험 통제 변수, 기록 기준을 정리한다."
 date: "2026-11-16"
 draft: false
@@ -9,7 +9,6 @@ slug: "study-ftrace-scheduler-latency-lab"
 area: "Linux Kernel"
 category: "Study"
 type: "concept"
-series: "OSLab Preparation"
 tags: ["ftrace", "trace-cmd", "kernelshark", "scheduler", "latency"]
 ---
 
@@ -87,9 +86,9 @@ CPU 개수와 kernel version, scheduler policy, CPU governor 등은 기록한다
 
 이런 정보가 없다면 다음에 같은 실험을 반복할 때 관측값을 비교하기 어렵다.
 
-## 8. 경험과 새로운 재현의 경계
+## 8. 다시 측정한다면
 
-이전에 Raspberry Pi에서 ftrace와 KernelShark를 사용해 **함수 호출과 스케줄링 이벤트를 살펴본 경험**이 있다. 그러나 그때의 정확한 latency 분포나 실행 환경 설정을 보관하고 있지 않다. 이 글은 다음에 같은 질문을 더 엄밀하게 검증하기 위한 분석 방법을 정리한 것이다.
+Raspberry Pi에서 ftrace와 KernelShark로 **함수 호출과 스케줄링 이벤트를 살펴봤을 때**, 타임라인을 보는 것과 지연 원인을 설명하는 것의 차이가 컸다. 당시의 latency 분포와 환경 설정은 남아 있지 않다. 다시 측정한다면 특정 TID의 wakeup과 CPU 배정 사이를 먼저 좁혀 보고, CPU quota와 I/O 대기를 함께 대조할 생각이다.
 
 ## 9. 질문
 
